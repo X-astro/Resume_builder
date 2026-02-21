@@ -339,32 +339,10 @@ async function enforceSinglePageFit(page) {
     });
     if (!layout.width || !layout.height)
         return;
-    const widthFitScale = A4_PRINTABLE_WIDTH_PX / layout.width;
-    const heightFitScale = A4_PRINTABLE_HEIGHT_PX / layout.height;
-    const widthScale = layout.width > A4_PRINTABLE_WIDTH_PX * OVERFLOW_TOLERANCE
-        ? widthFitScale
-        : 1;
-    const heightScale = layout.height > A4_PRINTABLE_HEIGHT_PX * OVERFLOW_TOLERANCE
-        ? heightFitScale
-        : 1;
-    let scale = Math.min(1, widthScale, heightScale);
-    // If content is much shorter than one page, scale up to fill the page better.
-    if (scale >= 0.999 && layout.height < A4_PRINTABLE_HEIGHT_PX * UNDERFLOW_THRESHOLD) {
-        const targetHeight = A4_PRINTABLE_HEIGHT_PX * TARGET_FILL_RATIO;
-        const desiredUpscale = targetHeight / layout.height;
-        const allowedUpscale = Math.min(widthFitScale, heightFitScale, MAX_UPSCALE);
-        scale = Math.max(1, Math.min(desiredUpscale, allowedUpscale));
-    }
-    if (scale > 0.999 && scale < 1.001)
-        return;
-    await page.evaluate((calculatedScale) => {
-        const doc = globalThis.document;
-        const body = doc?.body;
-        if (!body)
-            return;
-        // Use zoom instead of transform so print pagination uses scaled layout.
-        body.style.zoom = String(calculatedScale);
-    }, scale);
+    // Do NOT apply zoom. Template font sizes must render 1:1 in the PDF.
+    // Previously we scaled down when overflowing (and up when underflowing),
+    // which neutralized font-size changes. Now we render at actual size;
+    // content may spill to page 2 if fonts are large or content is long.
 }
 async function countEstimatedPages(page) {
     const scaledHeight = await page.evaluate(() => {
@@ -423,13 +401,14 @@ async function generateResumePDF(profile, template, tailoredContent, companyName
         });
         await page.emulateMediaType('print');
         await page.setContent(fullHtml, { waitUntil: 'networkidle0' });
-        // Path: {profile_name}/{current_date}/{company}/{role}/Resume.pdf
+        // Path: {profile_name}/{current_date}/{company}/{role}/{profile_name}.pdf
         const profileSlug = sanitizeFilename(profile.name) || 'unknown';
         const dateStr = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
         const companySlug = sanitizeFilename(companyName || 'unknown');
         const roleSlug = sanitizeFilename(role || 'resume');
-        const relativePath = `${profileSlug}/${dateStr}/${companySlug}/${roleSlug}/Resume.pdf`;
-        const filepath = path_1.default.join(GENERATED_DIR, profileSlug, dateStr, companySlug, roleSlug, 'Resume.pdf');
+        const pdfFilename = `${profileSlug}.pdf`;
+        const relativePath = `${profileSlug}/${dateStr}/${companySlug}/${roleSlug}/${pdfFilename}`;
+        const filepath = path_1.default.join(GENERATED_DIR, profileSlug, dateStr, companySlug, roleSlug, pdfFilename);
         let finalPdf = null;
         for (let attempt = 1; attempt <= SINGLE_PAGE_MAX_ATTEMPTS; attempt++) {
             await enforceSinglePageFit(page);

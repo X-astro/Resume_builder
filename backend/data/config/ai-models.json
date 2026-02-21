@@ -1,4 +1,4 @@
 {
-  "openaiEnabled": true,
-  "claudeEnabled": false
+  "openaiEnabled": false,
+  "claudeEnabled": true
 }

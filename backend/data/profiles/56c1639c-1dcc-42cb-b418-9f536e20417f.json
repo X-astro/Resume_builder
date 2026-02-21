@@ -2,7 +2,7 @@
   "name": "Daniel Kale",
   "title": "Senior Software Engineer",
   "preferredTemplate": "",
-  "disabled": true,
+  "disabled": false,
   "contact": {
     "phone": "+13523251136",
     "email": "daniel.kale98@gmail.com",
@@ -126,5 +126,5 @@
   "certifications": [],
   "id": "56c1639c-1dcc-42cb-b418-9f536e20417f",
   "createdAt": "2026-02-20T16:22:11.677Z",
-  "updatedAt": "2026-02-20T16:48:43.986Z"
+  "updatedAt": "2026-02-21T16:42:54.485Z"
 }
