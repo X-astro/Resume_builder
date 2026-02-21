@@ -1,0 +1,151 @@
+{
+  "name": "Brian Zhu",
+  "title": "Senior Software Engineer",
+  "contact": {
+    "email": "brian.zhu63828@gmail.com",
+    "phone": "(564) 225-2672",
+    "location": "Seattle, WA",
+    "linkedin": "https://www.linkedin.com/in/brian-zhu-20b063151/"
+  },
+  "summary": "Experienced Senior Backend Engineer with a specialization in Python-driven web applications, adept at designing and implementing robust backend architectures. Expertise in API design, cloud deployment, and async processing, with a focus on building scalable, high-performance systems. Skilled in integrating AI/ML technologies into full-stack solutions, delivering innovative and efficient solutions that meet business goals and drive technological advancements.",
+  "experience": [
+    {
+      "title": "Senior Software Engineer",
+      "company": "Amazon Web Services (AWS)",
+      "startDate": "10/2021",
+      "endDate": "Present",
+      "location": "Seattle, WA",
+      "description": "Led backend engineering to design scalable systems with Python, Django, Flask, and FastAPI, replacing legacy components with microservices to improve API latency and performance.",
+      "achievements": [
+        "Reduced operational costs by 25% through backend performance optimization and service consolidation",
+        "Migrated large Django monoliths into modular microservices using FastAPI for high-performance APIs",
+        "Integrated AI/ML models to optimize data processing and enhance decision-making",
+        "Significantly increased automated test coverage, improving release confidence and reducing production issues",
+        "Improved API response times and system throughput through async processing, query optimization, and caching strategies"
+      ]
+    },
+    {
+      "title": "Software Engineer",
+      "company": "GE HealthCare",
+      "startDate": "10/2019",
+      "endDate": "10/2021",
+      "location": "Salt Lake City, UT",
+      "description": "Architected and led the development of backend-centric web applications using Python, Django and FastAPI.",
+      "achievements": [
+        "Delivered 10+ production-grade, client-facing applications with robust backend architectures.",
+        "Standardized API design and documentation (OpenAPI/Swagger), improving cross-team collaboration and onboarding.",
+        "Improved overall application performance by approximately 35% through backend optimizations, query tuning, and efficient API design."
+      ]
+    },
+    {
+      "title": "Software Engineer Intern",
+      "company": "Amazon",
+      "startDate": "05/2018",
+      "endDate": "08/2018",
+      "location": "Seattle, WA",
+      "description": "Involved in coding, bug fixing, and designing internal tools and applications during the internship period.",
+      "achievements": [
+        "Contributed significantly to the development and release of production-ready software.",
+        "Contributed to the first production release within the first 6 months of the internship.",
+        "Took ownership of small internal tools, successfully delivering them by the end of the internship.",
+        "Built a strong foundation in React, JavaScript, Bootstrap, and SQL, gaining essential front-end development skills."
+      ]
+    }
+  ],
+  "skills": [
+    "Python",
+    "Django",
+    "FastAPI",
+    "Flask",
+    "Restful API",
+    "GraphQL",
+    "PostgreSQL",
+    "MongoDB",
+    "RDBMS/SQL",
+    "Redis",
+    "Celery",
+    "Pytest",
+    "TDD",
+    "Docker",
+    "Kubernetes",
+    "CI/CD",
+    "Nginx",
+    "AWS",
+    "Azure",
+    "GCP",
+    "Unix/Linux",
+    "Git",
+    "JavaScript",
+    "TypeScript",
+    "AI integration",
+    "Bootstrap",
+    "React",
+    "OpenAPI",
+    "Swagger",
+    "Async processing",
+    "Query optimization",
+    "Caching strategies"
+  ],
+  "strengths": [
+    {
+      "title": "Customer-Centric",
+      "description": "Applied advanced Python backend techniques to transform complex user requirements into efficient, data-driven solutions, achieving a 98% customer satisfaction rate."
+    },
+    {
+      "title": "Highly Detail-Oriented",
+      "description": "Diligently carried out impact analyses and code reviews to eliminate errors, lowering bug reports by 20%."
+    },
+    {
+      "title": "Excellent Mentorship",
+      "description": "Proven skill in mentoring junior developers, leading to a 30% increase in team productivity."
+    }
+  ],
+  "education": [
+    {
+      "degree": "Bachelor's in Computer Science",
+      "institution": "University of California, Berkeley",
+      "startDate": "08/2015",
+      "endDate": "05/2019",
+      "location": "Berkeley, CA"
+    }
+  ],
+  "certifications": [],
+  "id": "d9dc84cd-081f-4c18-990c-76e7de90f246",
+  "createdAt": "2026-02-20T12:13:39.254Z",
+  "updatedAt": "2026-02-20T12:13:52.336Z",
+  "hardSkills": [
+    "Python",
+    "Django",
+    "FastAPI",
+    "Flask",
+    "Restful API",
+    "GraphQL",
+    "PostgreSQL",
+    "MongoDB",
+    "RDBMS/SQL",
+    "Redis",
+    "Celery",
+    "Pytest",
+    "TDD",
+    "Docker",
+    "Kubernetes",
+    "CI/CD",
+    "Nginx",
+    "AWS",
+    "Azure",
+    "GCP",
+    "Unix/Linux",
+    "Git",
+    "JavaScript",
+    "TypeScript",
+    "AI integration",
+    "Bootstrap",
+    "React",
+    "OpenAPI",
+    "Swagger",
+    "Async processing",
+    "Query optimization",
+    "Caching strategies"
+  ],
+  "softSkills": []
+}

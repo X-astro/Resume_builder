@@ -1,0 +1,115 @@
+{
+  "name": "Artiom Ceban",
+  "title": "Senior Backend Engineer",
+  "preferredTemplate": "modern-blue-compact",
+  "contact": {
+    "email": "artiomceban83@gmail.com",
+    "phone": "+373 76 763 172",
+    "location": "Chisinau, Moldova",
+    "linkedin": "https://www.linkedin.com/in/artiomceban83/"
+  },
+  "summary": "Experienced Senior Backend Engineer with a specialization in Python-driven web applications, adept at designing and implementing robust backend architectures. Expertise in API design, cloud deployment, and async processing, with a focus on building scalable, high-performance systems. Skilled in integrating AI/ML technologies into full-stack solutions, delivering innovative and efficient solutions that meet business goals and drive technological advancements.",
+  "experience": [
+    {
+      "title": "Senior Software Engineer (Python Backend)",
+      "company": "Primeworks",
+      "startDate": "07/2021",
+      "endDate": "11/2025",
+      "location": "Chisinau, Moldova",
+      "description": "Lead the design, development, and optimization of scalable backend systems, ensuring high performance, security, and maintainability.",
+      "achievements": [
+        "Reduced operational costs by 25% through backend performance optimization and service consolidation",
+        "Migrated large Django monoliths into modular microservices using FastAPI for high-performance APIs",
+        "Integrated AI/ML models to optimize data processing and enhance decision-making",
+        "Significantly increased automated test coverage, improving release confidence and reducing production issues",
+        "Improved API response times and system throughput through async processing, query optimization, and caching strategies"
+      ]
+    },
+    {
+      "title": "Junior Software Engineer",
+      "company": "CreativSoft",
+      "startDate": "08/2019",
+      "endDate": "07/2021",
+      "location": "Chisinau, Moldova",
+      "description": "Assist in the design and development of scalable backend systems, focusing on performance, security, and maintainability.",
+      "achievements": [
+        "Created intuitive user interface using JavaScript and HTML5, assuring user-friendly design.",
+        "Managed basic Unix/Linux system tasks and maintained 99.9% uptime.",
+        "Set up data and provided UAT support, speeding up deployment time by 15%.",
+        "Assist in optimizing system performance, security, and maintainability.",
+        "Contributed to the development of APIs and cloud integrations, leveraging technologies like FastAPI and Django.",
+        "Supported the team in troubleshooting and resolving technical issues.",
+        "Participated in code reviews and followed established coding standards to maintain code quality."
+      ]
+    },
+    {
+      "title": "Software Engineer Intern",
+      "company": "CreativSoft",
+      "startDate": "11/2018",
+      "endDate": "07/2019",
+      "location": "Chisinau, Moldova",
+      "description": "Involved in coding, bug fixing, and designing internal tools and applications during the internship period.",
+      "achievements": [
+        "Contributed significantly to the development and release of production-ready software.",
+        "Contributed to the first production release within the first 6 months of the internship.",
+        "Took ownership of small internal tools, successfully delivering them by the end of the internship.",
+        "Built a strong foundation in React, JavaScript, Bootstrap, and SQL, gaining essential front-end development skills."
+      ]
+    }
+  ],
+  "skills": [
+    "Python",
+    "Django",
+    "FastAPI",
+    "Flask",
+    "Restful API",
+    "GraphQL",
+    "PostgreSQL",
+    "MongoDB",
+    "RDBMS/SQL",
+    "Redis",
+    "Celery",
+    "Pytest",
+    "TDD",
+    "Docker",
+    "Kubernetes",
+    "CI/CD",
+    "Nginx",
+    "AWS",
+    "Azure",
+    "GCP",
+    "Unix/Linux",
+    "Git",
+    "JavaScript",
+    "TypeScript",
+    "AI integration"
+  ],
+  "strengths": [
+    {
+      "title": "Customer-Centric",
+      "description": "Applied advanced Python backend techniques to transform complex user requirements into efficient, data-driven solutions, achieving a 98% customer satisfaction rate."
+    },
+    {
+      "title": "Highly Detail-Oriented",
+      "description": "Diligently carried out impact analyses and code reviews to eliminate errors, lowering bug reports by 20%."
+    },
+    {
+      "title": "Excellent Mentorship",
+      "description": "Proven skill in mentoring junior developers, leading to a 30% increase in team productivity."
+    }
+  ],
+  "education": [
+    {
+      "degree": "Bachelor's in Computer Science",
+      "institution": "Moldova State University",
+      "startDate": "11/2012",
+      "endDate": "05/2017",
+      "location": "Chisinau, Moldova"
+    }
+  ],
+  "certifications": [],
+  "id": "ee7a07d5-13c4-4c65-9730-2c1007eccf47",
+  "createdAt": "2026-02-17T03:12:20.741Z",
+  "updatedAt": "2026-02-20T12:13:58.068Z",
+  "disabled": true
+}

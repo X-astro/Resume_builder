@@ -1,0 +1,105 @@
+{
+  "name": "Yulian Nitsenko",
+  "title": "Senior Backend Engineer",
+  "preferredTemplate": "teal-sidebar-left-compact",
+  "contact": {
+    "email": "yulian.nitsenko0415@gmail.com",
+    "phone": "+420 737 216 250",
+    "location": "Pardubice, Czechia",
+    "linkedin": "https://www.linkedin.com/in/yulian-nitsenko-6b6968392"
+  },
+  "summary": "Senior Backend Engineer specializing in Python-based web applications. Experienced in backend architecture, API design, cloud deployment, async processing, scalable systems, and AI/ML-enabled full-stack solutions.",
+  "experience": [
+    {
+      "title": "Senior Software Engineer",
+      "company": "Celonis",
+      "startDate": "03/2020",
+      "endDate": "09/2025",
+      "location": "Pardubice, Czechia",
+      "description": "Led backend engineering efforts to design and deliver scalable, high-performance systems using Python, Django, and FastAPI.",
+      "achievements": [
+        "Architected and introduced high-throughput microservices to replace legacy components, significantly improving API latency and system reliability.",
+        "Reduced operational costs by 25% through backend performance optimization and service consolidation.",
+        "Migrated large Django monoliths into modular microservices using FastAPI for high-performance APIs.",
+        "Significantly increased automated test coverage, improving release confidence and reducing production issues.",
+        "Improved API response times and system throughput through async processing, query optimization, and caching strategies."
+      ]
+    },
+    {
+      "title": "Full Stack Engineer",
+      "company": "Profinit",
+      "startDate": "07/2014",
+      "endDate": "10/2018",
+      "location": "Pardubice, Czechia",
+      "description": "Architected and led the development of backend-centric web applications using Python, Django, and FastAPI.",
+      "achievements": [
+        "Delivered 10 production-grade, client-facing applications with robust backend architectures.",
+        "Standardized API design and documentation (OpenAPI/Swagger), improving cross-team collaboration and onboarding.",
+        "Improved overall application performance by 35% through backend optimizations, query tuning, and efficient API design."
+      ]
+    },
+    {
+      "title": "Junior Web Developer",
+      "company": "Profinit",
+      "startDate": "01/2012",
+      "endDate": "05/2014",
+      "location": "Pardubice, Czechia",
+      "description": "Role encompassed full software development lifecycle with a focus on Python and front-end technologies.",
+      "achievements": [
+        "Created intuitive user interface using JavaScript and HTML5, assuring user-friendly design.",
+        "Managed basic Unix/Linux system tasks and maintained 99.9% uptime.",
+        "Set up data and provided UAT support speeding up deployment time by 15%."
+      ]
+    }
+  ],
+  "skills": [
+    "Python",
+    "Django",
+    "FastAPI",
+    "Redis",
+    "Celery",
+    "CI/CD",
+    "Docker",
+    "Nginx",
+    "AWS",
+    "GCP",
+    "PostgreSQL",
+    "HTML",
+    "Unix/Linux",
+    "RDBMS/SQL"
+  ],
+  "strengths": [
+    {
+      "title": "Customer-Centric",
+      "description": "Utilized ORM expertise to translate user needs into robust solutions, delivering a 98% customer satisfaction rate."
+    },
+    {
+      "title": "Highly Detail Oriented",
+      "description": "Diligently carried out impact analyses and code reviews to eliminate errors, lowering bug reports by 20%."
+    },
+    {
+      "title": "Excellent Mentorship",
+      "description": "Proven skill in mentoring junior developers, leading to a 30% increase in team productivity."
+    }
+  ],
+  "education": [
+    {
+      "degree": "Bachelor's in Computer Science",
+      "institution": "Czech Technical University in Prague",
+      "startDate": "11/2005",
+      "endDate": "05/2010",
+      "location": "Prague, Czechia"
+    }
+  ],
+  "certifications": [
+    {
+      "name": "Certified Python Developer",
+      "issuer": "Codecademy",
+      "date": ""
+    }
+  ],
+  "id": "8a664b2f-716d-4783-b1bf-587258bb9b74",
+  "createdAt": "2026-02-17T03:12:45.507Z",
+  "updatedAt": "2026-02-20T12:13:56.909Z",
+  "disabled": true
+}

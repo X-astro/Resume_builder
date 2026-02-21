@@ -1,0 +1,130 @@
+{
+  "name": "Daniel Kale",
+  "title": "Senior Software Engineer",
+  "preferredTemplate": "",
+  "disabled": true,
+  "contact": {
+    "phone": "+13523251136",
+    "email": "daniel.kale98@gmail.com",
+    "linkedin": "https://www.linkedin.com/in/daniel-kale-109a993aa/",
+    "github": "",
+    "portfolio": "",
+    "location": "Spring Hill, FL, United States"
+  },
+  "summary": "Software Engineer with 8+ years of experience building scalable production systems and 3+ years shipping AI/ML-powered features. Deep expertise in Python, FastAPI, and LLM integration using LangChain and LangGraph, including RAG pipelines, automated workflows, and prompt optimization. Proven ability to architect high-performance APIs handling 15,000+ daily transactions with 99.7% uptime. Experienced in designing AI-driven agent-based systems, LLM evaluation, and deploying containerized applications on AWS, Azure, and GCP.",
+  "experience": [
+    {
+      "title": "Senior Software Engineer",
+      "company": "PrimeWorks",
+      "startDate": "04/2021",
+      "endDate": "11/2025",
+      "location": "",
+      "description": "Designed and shipped AI-powered features using LangChain and LangGraph, built and optimized high-performance FastAPI services, implemented prompt optimization and LLM evaluation pipelines, and architected scalable systems for AI-generated model validation.",
+      "achievements": [
+        "Designed and shipped AI-powered features using LangChain and LangGraph, including automated agent-based ticket routing, RAG-based document search with vector retrieval, and B2B purchase order extraction, reducing manual triage by 60% and boosting user engagement by 35%.",
+        "Built and optimized high-performance FastAPI services with Pydantic data validation and SQLAlchemy ORM, powering an enterprise SaaS platform serving global brands with 99.7% uptime and 15,000+ daily transactions.",
+        "Implemented prompt optimization and LLM evaluation pipelines to iteratively refine AI model outputs, improving accuracy and reducing hallucination rates across production AI features.",
+        "Architected scalable system for AI-generated model validation, enabling data scientists to build, test, and deploy agent-based models with rapid feedback loops for decision-makers."
+      ]
+    },
+    {
+      "title": "Software Engineer",
+      "company": "UberEats",
+      "startDate": "02/2018",
+      "endDate": "03/2021",
+      "location": "",
+      "description": "Designed Python backend services for real-time order management and delivery logistics, built high-throughput data pipelines for ML-powered forecasting, and developed React.js dashboards with live analytics.",
+      "achievements": [
+        "Designed Python backend services powering real-time order management and delivery logistics for one of the world’s largest food platforms, processing millions of daily events with Kafka, Redis, and PostgreSQL.",
+        "Built high-throughput data pipelines driving ML-powered demand forecasting, delivery ETAs, and surge pricing models across metro regions, establishing foundational experience in AI/ML-driven production systems.",
+        "Developed React.js and TypeScript dashboards with live analytics and automated alerting, cutting incident response time by 45% and improving restaurant onboarding speed by 30%."
+      ]
+    },
+    {
+      "title": "Junior Software Engineer",
+      "company": "Farmer’s Fridge",
+      "startDate": "05/2017",
+      "endDate": "01/2018",
+      "location": "",
+      "description": "Built full-stack Python/Django backend services and RESTful APIs for a distributed IoT smart fridge platform, and developed event-driven communication layers for real-time monitoring and payment confirmations.",
+      "achievements": [
+        "Built full-stack Python/Django backend services and RESTful APIs for a distributed IoT smart fridge platform, handling order processing, payments, and real-time telemetry across 200+ connected devices.",
+        "Developed event-driven communication layer with message queue handlers for real-time temperature monitoring, inventory tracking, and automated payment confirmations."
+      ]
+    }
+  ],
+  "strengths": [
+    {
+      "title": "AI/ML System Architecture",
+      "description": "Expertise in designing and deploying scalable AI/ML-powered production systems, including agent-based workflows and LLM integration."
+    },
+    {
+      "title": "Backend Engineering & API Development",
+      "description": "Proven ability to build high-performance backend services and APIs using Python, FastAPI, and related technologies, ensuring reliability and scalability."
+    },
+    {
+      "title": "Cloud & DevOps",
+      "description": "Experienced in deploying and managing containerized applications on AWS, Azure, and GCP, with strong knowledge of CI/CD and monitoring tools."
+    }
+  ],
+  "skills": [
+    "LangChain",
+    "LangGraph",
+    "OpenAI API",
+    "RAG Pipelines",
+    "Prompt Optimization",
+    "LLM Evaluation",
+    "Agent-Based Workflows",
+    "NLP",
+    "Python",
+    "FastAPI",
+    "Pydantic",
+    "SQLAlchemy",
+    "Django",
+    "Flask",
+    "Celery",
+    "PostgreSQL",
+    "Elasticsearch",
+    "Redis",
+    "MongoDB",
+    "FAISS",
+    "Vector Database Integration",
+    "AWS",
+    "Azure",
+    "GCP",
+    "Docker",
+    "Kubernetes",
+    "CI/CD",
+    "Datadog",
+    "Prometheus",
+    "Grafana",
+    "React.js",
+    "Next.js",
+    "TypeScript",
+    "REST",
+    "GraphQL",
+    "gRPC",
+    "Microservices Architecture",
+    "Kafka",
+    "Event-driven Architecture",
+    "IoT",
+    "Order Processing",
+    "Payments",
+    "Telemetry",
+    "Message Queues"
+  ],
+  "education": [
+    {
+      "degree": "Bachelor of Science in Computer Science",
+      "institution": "University of South Florida",
+      "startDate": "05/2013",
+      "endDate": "08/2017",
+      "location": "Tampa, FL, United States",
+      "gpa": ""
+    }
+  ],
+  "certifications": [],
+  "id": "56c1639c-1dcc-42cb-b418-9f536e20417f",
+  "createdAt": "2026-02-20T16:22:11.677Z",
+  "updatedAt": "2026-02-20T16:48:43.986Z"
+}

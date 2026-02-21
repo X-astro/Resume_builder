@@ -1,0 +1,87 @@
+{
+  "name": "Hayato Gibbons",
+  "title": "Senior Software Engineer",
+  "totalYearsExperience": 9,
+  "preferredTemplate": "",
+  "disabled": false,
+  "contact": {
+    "phone": "‪(202) 656-8065‬",
+    "email": "hayato.gibbons5899@gmail.com",
+    "linkedin": "https://www.linkedin.com/in/hayato-gibbons-01b84a102/",
+    "github": "",
+    "portfolio": "",
+    "location": "Brooklyn, NY"
+  },
+  "summary": "",
+  "experience": [
+    {
+      "title": "Senior Software Engineer",
+      "company": "SoFi",
+      "startDate": "10/2025",
+      "endDate": "Present",
+      "location": "Brooklyn, NY",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Software Engineer II",
+      "company": "Amazon",
+      "startDate": "07/2021",
+      "endDate": "09/2025",
+      "location": "Brooklyn, NY",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Senior Software Engineer",
+      "company": "Capital Technology Group",
+      "startDate": "05/2020",
+      "endDate": "08/2021",
+      "location": "Arlington, VA",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Senior Innovator",
+      "company": "Cleverspeck",
+      "startDate": "10/2016",
+      "endDate": "05/2020",
+      "location": "Arlington, VA",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Software Development Intern",
+      "company": "DataWorks",
+      "startDate": "06/2025",
+      "endDate": "07/2015",
+      "location": "Arlington, VA",
+      "description": "",
+      "achievements": []
+    }
+  ],
+  "strengths": [],
+  "skills": [],
+  "education": [
+    {
+      "degree": "Bachelor's Computer Science",
+      "institution": "George Mason University",
+      "startDate": "2011",
+      "endDate": "2016",
+      "location": "Fairfax, VA",
+      "gpa": ""
+    },
+    {
+      "degree": "Master's in Data Analystics",
+      "institution": "George Mason University",
+      "startDate": "2017",
+      "endDate": "2022",
+      "location": "Fairfax, VA",
+      "gpa": ""
+    }
+  ],
+  "certifications": [],
+  "id": "99f67fb0-ecc0-48ad-a31b-88b0cfc74ce2",
+  "createdAt": "2026-02-20T13:29:27.925Z",
+  "updatedAt": "2026-02-20T14:16:39.535Z"
+}
