@@ -65,7 +65,7 @@ export default function AdminLayout({
       isMounted = false;
       window.clearTimeout(safetyTimer);
     };
-  }, [checkAuth, pathname]);
+  }, [checkAuth]);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated && pathname !== '/admin') {
