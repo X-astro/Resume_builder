@@ -370,12 +370,19 @@ function getResumeTitle(profile) {
     const lastRole = profile.experience?.[0]?.title?.trim();
     return lastRole || 'Professional';
 }
+/** Sanitize title for ATS: remove hyphens, periods, commas, and other symbols */
+function sanitizeTitleForATS(title) {
+    return title
+        .replace(/[-.,;:'"()\[\]\/\\@#$%&*+=<>]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
 function prepareResumeRenderData(profile, tailoredContent, companyName, role) {
     const data = {
         ...profile,
         companyName: companyName || '',
         role: role || '',
-        title: tailoredContent?.title ?? getResumeTitle(profile),
+        title: sanitizeTitleForATS(tailoredContent?.title ?? getResumeTitle(profile)),
         ...(tailoredContent && {
             summary: tailoredContent.summary,
             experience: tailoredContent.experience,

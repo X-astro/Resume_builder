@@ -404,6 +404,14 @@ function getResumeTitle(profile: Profile): string {
   return lastRole || 'Professional';
 }
 
+/** Sanitize title for ATS: remove hyphens, periods, commas, and other symbols */
+function sanitizeTitleForATS(title: string): string {
+  return title
+    .replace(/[-.,;:'"()\[\]\/\\@#$%&*+=<>]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 export function prepareResumeRenderData(
   profile: Profile,
   tailoredContent?: TailoredContent,
@@ -414,7 +422,7 @@ export function prepareResumeRenderData(
     ...profile,
     companyName: companyName || '',
     role: role || '',
-    title: tailoredContent?.title ?? getResumeTitle(profile),
+    title: sanitizeTitleForATS(tailoredContent?.title ?? getResumeTitle(profile)),
     ...(tailoredContent && {
       summary: tailoredContent.summary,
       experience: tailoredContent.experience,

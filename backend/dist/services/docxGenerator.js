@@ -42,9 +42,9 @@ function buildHayatoStyleHTML(data) {
 <head><meta charset="UTF-8"></head>
 <body style="font-family: Calibri, Arial, sans-serif; font-size: 9pt; color: #333333;">
   <div style="text-align: center;">
-    <p style="font-size: 22pt; font-weight: bold; color: #333333; margin: 0 0 4pt 0;">${esc(data.name)}</p>
-    <p style="font-size: 10pt; color: #333333; margin: 0 0 4pt 0;">${esc(data.title)}</p>
-    <p style="font-size: 9pt; color: #555555; margin: 0 0 14pt 0;">${contactLine}</p>
+    <p style="font-size: 22pt; font-weight: bold; color: #333333; margin: 0 0 4pt 0; text-align: center;">${esc(data.name)}</p>
+    <p style="font-size: 10pt; color: #333333; margin: 0 0 4pt 0; text-align: center;">${esc(data.title)}</p>
+    <p style="font-size: 9pt; color: #555555; margin: 0 0 14pt 0; text-align: center;">${contactLine}</p>
   </div>
 
   <p style="margin: 14pt 0 6pt 0;"><strong style="font-size: 11pt; text-decoration: underline; color: #333333;">Professional Summary</strong></p>

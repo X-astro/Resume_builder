@@ -30,7 +30,7 @@ export default function ResumePreview({
           <h3 className="text-lg font-semibold text-gray-900">Resume Preview</h3>
           {isTailored && (
             <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
-              ATS Optimized
+              ATS OPTIMIZATION
             </span>
           )}
         </div>
