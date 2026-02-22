@@ -319,8 +319,12 @@ export const resumeApi = {
     companyName: string;
     role: string;
     model: AIProvider;
+    format?: 'pdf' | 'docx' | 'both';
   }) =>
-    apiFetch<{ filename: string; downloadUrl: string; tailored: boolean }>(
+    apiFetch<
+      | { filename: string; downloadUrl: string; tailored: boolean; format?: 'pdf' | 'docx' }
+      | { pdf: { filename: string; downloadUrl: string }; docx: { filename: string; downloadUrl: string }; tailored: boolean }
+    >(
       '/resume/generate',
       {
         method: 'POST',

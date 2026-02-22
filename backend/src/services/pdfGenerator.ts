@@ -397,6 +397,36 @@ function countPdfPages(pdfBuffer: Buffer): number {
   return matches?.length ?? 1;
 }
 
+function getResumeTitle(profile: Profile): string {
+  const profileTitle = profile.title?.trim();
+  if (profileTitle) return profileTitle;
+  const lastRole = profile.experience?.[0]?.title?.trim();
+  return lastRole || 'Professional';
+}
+
+export function prepareResumeRenderData(
+  profile: Profile,
+  tailoredContent?: TailoredContent,
+  companyName?: string,
+  role?: string
+) {
+  const data = {
+    ...profile,
+    companyName: companyName || '',
+    role: role || '',
+    title: tailoredContent?.title ?? getResumeTitle(profile),
+    ...(tailoredContent && {
+      summary: tailoredContent.summary,
+      experience: tailoredContent.experience,
+      skills: tailoredContent.skills || [],
+      hardSkills: tailoredContent.hardSkills || [],
+      softSkills: tailoredContent.softSkills || [],
+      strengths: tailoredContent.strengths
+    })
+  };
+  return normalizeExperienceDescriptions(applySkillsLimit(data));
+}
+
 export async function generateResumePDF(
   profile: Profile,
   template: Template,
@@ -406,23 +436,7 @@ export async function generateResumePDF(
 ): Promise<string> {
   await ensureGeneratedDir();
 
-  // Merge profile with tailored content
-  const data = {
-    ...profile,
-    companyName: companyName || '',
-    role: role || '',
-    ...(tailoredContent && {
-      title: tailoredContent.title,
-      summary: tailoredContent.summary,
-      experience: tailoredContent.experience,
-      skills: tailoredContent.skills || [],
-      hardSkills: tailoredContent.hardSkills || [],
-      softSkills: tailoredContent.softSkills || [],
-      strengths: tailoredContent.strengths
-    })
-  };
-
-  const renderData = normalizeExperienceDescriptions(applySkillsLimit(data));
+  const renderData = prepareResumeRenderData(profile, tailoredContent, companyName, role);
 
   // Compile and render template
   const compiledTemplate = Handlebars.compile(template.htmlContent);
@@ -516,21 +530,7 @@ export async function generatePreviewHTML(
   template: Template,
   tailoredContent?: TailoredContent
 ): Promise<string> {
-  // Merge profile with tailored content
-  const data = {
-    ...profile,
-    ...(tailoredContent && {
-      title: tailoredContent.title,
-      summary: tailoredContent.summary,
-      experience: tailoredContent.experience,
-      skills: tailoredContent.skills || [],
-      hardSkills: tailoredContent.hardSkills || [],
-      softSkills: tailoredContent.softSkills || [],
-      strengths: tailoredContent.strengths
-    })
-  };
-
-  const renderData = normalizeExperienceDescriptions(applySkillsLimit(data));
+  const renderData = prepareResumeRenderData(profile, tailoredContent);
 
   // Compile and render template
   const compiledTemplate = Handlebars.compile(template.htmlContent);

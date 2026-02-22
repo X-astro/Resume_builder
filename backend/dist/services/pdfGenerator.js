@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.prepareResumeRenderData = prepareResumeRenderData;
 exports.generateResumePDF = generateResumePDF;
 exports.generatePreviewHTML = generatePreviewHTML;
 exports.getGeneratedPDFPath = getGeneratedPDFPath;
@@ -362,15 +363,20 @@ function countPdfPages(pdfBuffer) {
     const matches = content.match(/\/Type\s*\/Page\b/g);
     return matches?.length ?? 1;
 }
-async function generateResumePDF(profile, template, tailoredContent, companyName, role) {
-    await ensureGeneratedDir();
-    // Merge profile with tailored content
+function getResumeTitle(profile) {
+    const profileTitle = profile.title?.trim();
+    if (profileTitle)
+        return profileTitle;
+    const lastRole = profile.experience?.[0]?.title?.trim();
+    return lastRole || 'Professional';
+}
+function prepareResumeRenderData(profile, tailoredContent, companyName, role) {
     const data = {
         ...profile,
         companyName: companyName || '',
         role: role || '',
+        title: tailoredContent?.title ?? getResumeTitle(profile),
         ...(tailoredContent && {
-            title: tailoredContent.title,
             summary: tailoredContent.summary,
             experience: tailoredContent.experience,
             skills: tailoredContent.skills || [],
@@ -379,7 +385,11 @@ async function generateResumePDF(profile, template, tailoredContent, companyName
             strengths: tailoredContent.strengths
         })
     };
-    const renderData = normalizeExperienceDescriptions(applySkillsLimit(data));
+    return normalizeExperienceDescriptions(applySkillsLimit(data));
+}
+async function generateResumePDF(profile, template, tailoredContent, companyName, role) {
+    await ensureGeneratedDir();
+    const renderData = prepareResumeRenderData(profile, tailoredContent, companyName, role);
     // Compile and render template
     const compiledTemplate = handlebars_1.default.compile(template.htmlContent);
     const html = compiledTemplate(renderData);
@@ -454,20 +464,7 @@ async function generateResumePDF(profile, template, tailoredContent, companyName
     }
 }
 async function generatePreviewHTML(profile, template, tailoredContent) {
-    // Merge profile with tailored content
-    const data = {
-        ...profile,
-        ...(tailoredContent && {
-            title: tailoredContent.title,
-            summary: tailoredContent.summary,
-            experience: tailoredContent.experience,
-            skills: tailoredContent.skills || [],
-            hardSkills: tailoredContent.hardSkills || [],
-            softSkills: tailoredContent.softSkills || [],
-            strengths: tailoredContent.strengths
-        })
-    };
-    const renderData = normalizeExperienceDescriptions(applySkillsLimit(data));
+    const renderData = prepareResumeRenderData(profile, tailoredContent);
     // Compile and render template
     const compiledTemplate = handlebars_1.default.compile(template.htmlContent);
     const html = compiledTemplate(renderData);

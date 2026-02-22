@@ -3,6 +3,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { analyzeJobDescription, tailorResume, resolveAIProvider } from '../services/claude';
 import { generateResumePDF, generatePreviewHTML, getGeneratedPDFPath } from '../services/pdfGenerator';
+import { generateResumeDOCX } from '../services/docxGenerator';
 import { getTemplateById, createDefaultTemplate } from '../services/templateExtractor';
 import { getAIModelSettings, getDefaultEnabledProvider, isProviderEnabled } from '../services/aiModelConfig';
 import { Profile } from '../types/profile';
@@ -56,7 +57,8 @@ router.post('/generate', async (req: Request, res: Response) => {
       jobAnalysis,
       companyName,
       role,
-      model
+      model,
+      format = 'pdf'
     }: GenerateResumeRequest = req.body;
     const settings = await getAIModelSettings();
     const selectedModel = resolveAIProvider(model);
@@ -118,14 +120,32 @@ router.post('/generate', async (req: Request, res: Response) => {
       tailoredContent = await tailorResume(profile, analysis, selectedModel);
     }
 
-    // Generate PDF with company name and role
-    const filename = await generateResumePDF(profile, template, tailoredContent, companyName.trim(), role.trim());
+    const generateBoth = (format as string) === 'both';
 
-    res.json({
-      filename,
-      downloadUrl: `/api/generated/${filename}`,
-      tailored: !!tailoredContent
-    });
+    if (generateBoth) {
+      const [pdfFilename, docxFilename] = await Promise.all([
+        generateResumePDF(profile, template, tailoredContent, companyName.trim(), role.trim()),
+        generateResumeDOCX(profile, tailoredContent, companyName.trim(), role.trim()),
+      ]);
+      res.json({
+        pdf: { filename: pdfFilename, downloadUrl: `/api/generated/${pdfFilename}` },
+        docx: { filename: docxFilename, downloadUrl: `/api/generated/${docxFilename}` },
+        tailored: !!tailoredContent,
+      });
+    } else {
+      const formatNorm = format === 'docx' ? 'docx' : 'pdf';
+      const filename =
+        formatNorm === 'docx'
+          ? await generateResumeDOCX(profile, tailoredContent, companyName.trim(), role.trim())
+          : await generateResumePDF(profile, template, tailoredContent, companyName.trim(), role.trim());
+
+      res.json({
+        filename,
+        downloadUrl: `/api/generated/${filename}`,
+        tailored: !!tailoredContent,
+        format: formatNorm
+      });
+    }
   } catch (error) {
     console.error('Error generating resume:', error);
     res.status(500).json({
@@ -199,8 +219,8 @@ router.post('/preview', async (req: Request, res: Response) => {
   }
 });
 
-// Download generated PDF
-router.get('/download/:filename', async (req: Request<{ filename: string }>, res: Response) => {
+// Download generated resume (PDF or DOCX)
+router.get('/download/:filename(*)', async (req: Request<{ filename: string }>, res: Response) => {
   try {
     const filepath = await getGeneratedPDFPath(req.params.filename);
     if (!filepath) {
@@ -208,9 +228,14 @@ router.get('/download/:filename', async (req: Request<{ filename: string }>, res
       return;
     }
 
-    // Set headers to force download
-    res.setHeader('Content-Disposition', `attachment; filename="${req.params.filename}"`);
-    res.setHeader('Content-Type', 'application/pdf');
+    const ext = path.extname(req.params.filename).toLowerCase();
+    const contentType =
+      ext === '.docx'
+        ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        : 'application/pdf';
+
+    res.setHeader('Content-Disposition', `attachment; filename="${path.basename(req.params.filename)}"`);
+    res.setHeader('Content-Type', contentType);
     res.download(filepath);
   } catch (error) {
     res.status(500).json({ error: 'Failed to download file' });

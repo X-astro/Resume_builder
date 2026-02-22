@@ -42,7 +42,8 @@ export default function Home() {
 
   // Preview states
   const [previewHtml, setPreviewHtml] = useState('');
-  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const [downloadPdfUrl, setDownloadPdfUrl] = useState<string | null>(null);
+  const [downloadDocxUrl, setDownloadDocxUrl] = useState<string | null>(null);
   const [isTailored, setIsTailored] = useState(false);
 
   useEffect(() => {
@@ -149,7 +150,7 @@ export default function Home() {
       setPreviewHtml(previewResponse.html);
       setIsTailored(previewResponse.tailored);
 
-      setGenerationStep('Generating PDF...');
+      setGenerationStep('Generating PDF and DOCX...');
 
       const generateResponse = await resumeApi.generate({
         profileId: selectedProfileId,
@@ -159,8 +160,17 @@ export default function Home() {
         companyName: companyName.trim(),
         role: role.trim(),
         model: selectedModel,
+        format: 'both',
       });
-      setDownloadUrl(`${getApiOrigin()}${generateResponse.downloadUrl}`);
+
+      const base = getApiOrigin();
+      if ('pdf' in generateResponse && 'docx' in generateResponse) {
+        setDownloadPdfUrl(`${base}${generateResponse.pdf.downloadUrl}`);
+        setDownloadDocxUrl(`${base}${generateResponse.docx.downloadUrl}`);
+      } else {
+        setDownloadPdfUrl(null);
+        setDownloadDocxUrl(null);
+      }
 
       setGenerationStep('');
     } catch (err) {
@@ -171,23 +181,22 @@ export default function Home() {
     }
   };
 
-  const handleDownload = async () => {
-    if (downloadUrl) {
-      try {
-        const response = await fetch(downloadUrl);
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = downloadUrl.split('/').pop() || 'resume.pdf';
-        document.body.appendChild(link);
-        link.click();
-        window.URL.revokeObjectURL(url);
-        link.remove();
-      } catch (error) {
-        console.error('Download failed:', error);
-        setError('Failed to download resume');
-      }
+  const handleDownload = async (url: string, filename: string) => {
+    if (!url) return;
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const objectUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = objectUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      window.URL.revokeObjectURL(objectUrl);
+      link.remove();
+    } catch (error) {
+      console.error('Download failed:', error);
+      setError('Failed to download resume');
     }
   };
 
@@ -344,8 +353,10 @@ export default function Home() {
           <div>
             <ResumePreview
               html={previewHtml}
-              downloadUrl={downloadUrl}
-              onDownload={handleDownload}
+              downloadPdfUrl={downloadPdfUrl}
+              downloadDocxUrl={downloadDocxUrl}
+              onDownloadPdf={() => handleDownload(downloadPdfUrl!, downloadPdfUrl?.split('/').pop() || 'resume.pdf')}
+              onDownloadDocx={() => handleDownload(downloadDocxUrl!, downloadDocxUrl?.split('/').pop() || 'resume.docx')}
               onGenerate={handleGenerateResume}
               isGenerating={isGenerating}
               isTailored={isTailored}

@@ -8,6 +8,7 @@ const promises_1 = __importDefault(require("fs/promises"));
 const path_1 = __importDefault(require("path"));
 const claude_1 = require("../services/claude");
 const pdfGenerator_1 = require("../services/pdfGenerator");
+const docxGenerator_1 = require("../services/docxGenerator");
 const templateExtractor_1 = require("../services/templateExtractor");
 const aiModelConfig_1 = require("../services/aiModelConfig");
 const router = (0, express_1.Router)();
@@ -48,7 +49,7 @@ router.post('/analyze', async (req, res) => {
 // Generate tailored resume
 router.post('/generate', async (req, res) => {
     try {
-        const { profileId, templateId, jobDescription, jobAnalysis, companyName, role, model } = req.body;
+        const { profileId, templateId, jobDescription, jobAnalysis, companyName, role, model, format = 'pdf' } = req.body;
         const settings = await (0, aiModelConfig_1.getAIModelSettings)();
         const selectedModel = (0, claude_1.resolveAIProvider)(model);
         if (!(0, aiModelConfig_1.isProviderEnabled)(selectedModel, settings)) {
@@ -103,13 +104,30 @@ router.post('/generate', async (req, res) => {
             const analysis = jobAnalysis || await (0, claude_1.analyzeJobDescription)(jobDescription, selectedModel);
             tailoredContent = await (0, claude_1.tailorResume)(profile, analysis, selectedModel);
         }
-        // Generate PDF with company name and role
-        const filename = await (0, pdfGenerator_1.generateResumePDF)(profile, template, tailoredContent, companyName.trim(), role.trim());
-        res.json({
-            filename,
-            downloadUrl: `/api/generated/${filename}`,
-            tailored: !!tailoredContent
-        });
+        const generateBoth = format === 'both';
+        if (generateBoth) {
+            const [pdfFilename, docxFilename] = await Promise.all([
+                (0, pdfGenerator_1.generateResumePDF)(profile, template, tailoredContent, companyName.trim(), role.trim()),
+                (0, docxGenerator_1.generateResumeDOCX)(profile, tailoredContent, companyName.trim(), role.trim()),
+            ]);
+            res.json({
+                pdf: { filename: pdfFilename, downloadUrl: `/api/generated/${pdfFilename}` },
+                docx: { filename: docxFilename, downloadUrl: `/api/generated/${docxFilename}` },
+                tailored: !!tailoredContent,
+            });
+        }
+        else {
+            const formatNorm = format === 'docx' ? 'docx' : 'pdf';
+            const filename = formatNorm === 'docx'
+                ? await (0, docxGenerator_1.generateResumeDOCX)(profile, tailoredContent, companyName.trim(), role.trim())
+                : await (0, pdfGenerator_1.generateResumePDF)(profile, template, tailoredContent, companyName.trim(), role.trim());
+            res.json({
+                filename,
+                downloadUrl: `/api/generated/${filename}`,
+                tailored: !!tailoredContent,
+                format: formatNorm
+            });
+        }
     }
     catch (error) {
         console.error('Error generating resume:', error);
@@ -178,17 +196,20 @@ router.post('/preview', async (req, res) => {
         });
     }
 });
-// Download generated PDF
-router.get('/download/:filename', async (req, res) => {
+// Download generated resume (PDF or DOCX)
+router.get('/download/:filename(*)', async (req, res) => {
     try {
         const filepath = await (0, pdfGenerator_1.getGeneratedPDFPath)(req.params.filename);
         if (!filepath) {
             res.status(404).json({ error: 'File not found' });
             return;
         }
-        // Set headers to force download
-        res.setHeader('Content-Disposition', `attachment; filename="${req.params.filename}"`);
-        res.setHeader('Content-Type', 'application/pdf');
+        const ext = path_1.default.extname(req.params.filename).toLowerCase();
+        const contentType = ext === '.docx'
+            ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            : 'application/pdf';
+        res.setHeader('Content-Disposition', `attachment; filename="${path_1.default.basename(req.params.filename)}"`);
+        res.setHeader('Content-Type', contentType);
         res.download(filepath);
     }
     catch (error) {

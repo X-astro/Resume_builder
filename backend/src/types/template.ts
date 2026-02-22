@@ -58,6 +58,8 @@ export interface TailoredStrength {
   description: string;
 }
 
+export type ResumeFormat = 'pdf' | 'docx' | 'both';
+
 export interface GenerateResumeRequest {
   profileId: string;
   templateId: string;
@@ -66,4 +68,5 @@ export interface GenerateResumeRequest {
   model?: AIProvider;
   companyName: string;
   role: string;
+  format?: ResumeFormat;
 }
