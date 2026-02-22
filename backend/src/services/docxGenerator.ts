@@ -18,8 +18,8 @@ function sanitizeFilename(str: string): string {
 }
 
 /**
- * Builds HTML in hayato-style: one column, Calibri, centered header,
- * underlined section titles. Matches reference docx structure.
+ * Builds HTML in Daniel-style: Arial, centered header (name, title, contact),
+ * blue accent (#2B5C8A), section headers with underline.
  */
 function buildHayatoStyleHTML(data: ReturnType<typeof prepareResumeRenderData>): string {
   const esc = (s: string) =>
@@ -29,43 +29,51 @@ function buildHayatoStyleHTML(data: ReturnType<typeof prepareResumeRenderData>):
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
 
-  const contactParts: string[] = [esc(data.contact?.email ?? '')];
-  if (data.contact?.phone) contactParts.push(esc(data.contact.phone));
+  const contactParts: string[] = [];
   if (data.contact?.location) contactParts.push(esc(data.contact.location));
+  if (data.contact?.phone) contactParts.push(esc(data.contact.phone));
+  if (data.contact?.email) contactParts.push(esc(data.contact.email));
   if (data.contact?.linkedin) contactParts.push(`<a href="${esc(data.contact.linkedin)}">${esc(data.contact.linkedin)}</a>`);
-  const contactLine = contactParts.filter(Boolean).join(' | ');
+  const contactLine = contactParts.filter(Boolean).join('  •  ');
+
+  const accentColor = '#2B5C8A';
+  const sectionStyle = `margin: 5pt 0 6pt 0; font-size: 11pt; font-weight: bold; color: ${accentColor}; border-bottom: 1px solid ${accentColor}; padding-bottom: 2pt;`;
 
   let html = `
 <!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"></head>
-<body style="font-family: Calibri, Arial, sans-serif; font-size: 9pt; color: #333333;">
+<body style="font-family: Arial, sans-serif; font-size: 10pt; color: #1A1A1A;">
   <div style="text-align: center;">
-    <p style="font-size: 22pt; font-weight: bold; color: #333333; margin: 0 0 4pt 0; text-align: center;">${esc(data.name)}</p>
-    <p style="font-size: 10pt; color: #333333; margin: 0 0 4pt 0; text-align: center;">${esc(data.title)}</p>
+    <p style="font-size: 20pt; font-weight: bold; color: #1A1A1A; margin: 0 0 5pt 0; text-align: center;">${esc(data.name)}</p>
+    <p style="font-size: 12pt; font-weight: bold; color: ${accentColor}; margin: 0 0 5pt 0; text-align: center;">${esc(data.title)}</p>
     <p style="font-size: 9pt; color: #555555; margin: 0 0 14pt 0; text-align: center;">${contactLine}</p>
+    <p style="margin: 0;"><br></p>
   </div>
 
-  <p style="margin: 14pt 0 6pt 0;"><strong style="font-size: 11pt; text-decoration: underline; color: #333333;">Professional Summary</strong></p>
-  <p style="font-size: 10pt; color: #333333; margin: 0 0 12pt 0; line-height: 1.35;">${esc(data.summary || '')}</p>
+  <p style="${sectionStyle}"><u>Professional Summary</u></p>
+  <p style="font-size: 10pt; color: #1A1A1A; margin: 0 0 12pt 0; line-height: 1.35;">${esc(data.summary || '')}</p>
+  <p style="margin: 0;"><br></p>
 
   ${(data.strengths?.length ?? 0) > 0 ? `
-  <p style="margin: 14pt 0 6pt 0;"><strong style="font-size: 11pt; text-decoration: underline; color: #333333;">Key Strengths</strong></p>
+  <p style="${sectionStyle}"><u>Key Strengths</u></p>
   ${(data.strengths ?? [])
     .map(
       (s: { title?: string; description?: string }) =>
-        `<p style="margin: 4pt 0 2pt 0; font-weight: bold; font-size: 9pt; color: #333333;">${esc(s.title ?? '')}</p>
-  <p style="margin: 0 0 8pt 0; font-size: 9pt; color: #333333; line-height: 1.35;">${esc(s.description ?? '')}</p>`
+        `<p style="margin: 4pt 0 2pt 0; font-weight: bold; font-size: 9pt; color: #1A1A1A;">${esc(s.title ?? '')}</p>
+  <p style="margin: 0 0 8pt 0; font-size: 9pt; color: #1A1A1A; line-height: 1.35;">${esc(s.description ?? '')}</p>`
     )
     .join('\n  ')}
+  <p style="margin: 0;"><br></p>
   ` : ''}
 
-  <p style="margin: 14pt 0 6pt 0;"><strong style="font-size: 11pt; text-decoration: underline; color: #333333;">Skills</strong></p>
-  <p style="font-size: 9pt; color: #333333; margin: 0 0 14pt 0; line-height: 1.35;">${esc(
+  <p style="${sectionStyle}"><u>Technical Skills</u></p>
+  <p style="font-size: 9pt; color: #1A1A1A; margin: 0 0 14pt 0; line-height: 1.35;">${esc(
     [...(data.hardSkills ?? data.skills ?? []), ...(data.softSkills ?? [])].filter(Boolean).join(', ')
   )}</p>
+  <p style="margin: 0;"><br></p>
 
-  <p style="margin: 14pt 0 6pt 0;"><strong style="font-size: 11pt; text-decoration: underline; color: #333333;">Experience</strong></p>
+  <p style="${sectionStyle}"><u>Professional Experience</u></p>
   ${(data.experience ?? [])
     .map(
       (exp: {
@@ -80,19 +88,20 @@ function buildHayatoStyleHTML(data: ReturnType<typeof prepareResumeRenderData>):
         const dates = [exp.startDate, exp.endDate].filter(Boolean).join(' – ');
         const loc = exp.location ? ` • ${exp.location}` : '';
         const bullets = (exp.achievements ?? [])
-          .map((a: string) => `<p style="margin: 0 0 4pt 0; font-size: 9pt; color: #333333; line-height: 1.35;">- ${esc(a)}</p>`)
+          .map((a: string) => `<p style="font-size: 9pt; color: #1A1A1A; line-height: 1.35;">- ${esc(a)}</p>`)
           .join('\n  ');
         return `
-  <p style="margin: 8pt 0 0; font-weight: bold; font-size: 10pt; color: #333333;">${esc(exp.title ?? '')}</p>
-  <p style="margin: 0; font-size: 9pt; color: #444444;">${esc(exp.company ?? '')}</p>
-  <p style="margin: 0 0 4pt 0; font-size: 8pt; color: #666666; font-style: italic;">${esc(dates)}${esc(loc)}</p>
-  <p style="margin: 0 0 4pt 0; font-size: 9pt; color: #333333; line-height: 1.35;">${esc(exp.description ?? '')}</p>
+  <p style="font-weight: bold; font-size: 11pt; color: #1A1A1A;">${esc(exp.company ?? '')}</p>
+  <p style="font-size: 10pt; color: ${accentColor}; font-style: italic;">${esc(exp.title ?? '')}</p>
+  <p style="font-size: 8pt; color: #555555;">${esc(dates)}${esc(loc)}</p>
+  <p style="font-size: 9pt; color: #1A1A1A; line-height: 1.35;">${esc(exp.description ?? '')}</p>
   ${bullets}`;
       }
     )
     .join('\n')}
+  <p style="margin: 0;"><br></p>
 
-  <p style="margin: 14pt 0 6pt 0;"><strong style="font-size: 11pt; text-decoration: underline; color: #333333;">Education</strong></p>
+  <p style="${sectionStyle}"><u>Education</u></p>
   ${(data.education ?? [])
     .map(
       (edu: {
@@ -105,9 +114,9 @@ function buildHayatoStyleHTML(data: ReturnType<typeof prepareResumeRenderData>):
         const dates = [edu.startDate, edu.endDate].filter(Boolean).join(' – ');
         const loc = edu.location ? ` • ${edu.location}` : '';
         return `
-  <p style="margin: 6pt 0 0; font-weight: bold; font-size: 10pt; color: #333333;">${esc(edu.degree ?? '')}</p>
-  <p style="margin: 0; font-size: 9pt; color: #444444;">${esc(edu.institution ?? '')}${esc(loc)}</p>
-  <p style="margin: 0 0 8pt 0; font-size: 8pt; color: #666666; font-style: italic;">${esc(dates)}</p>`;
+  <p style="font-weight: bold; font-size: 10pt; color: #1A1A1A;">${esc(edu.degree ?? '')}</p>
+  <p style="font-size: 9pt; color: #555555;">${esc(edu.institution ?? '')}${esc(loc)}</p>
+  <p style="font-size: 8pt; color: #555555;">${esc(dates)}</p>`;
       }
     )
     .join('\n')}
@@ -127,7 +136,7 @@ export async function generateResumeDOCX(
   const html = buildHayatoStyleHTML(renderData);
 
   const docxBuffer = await HTMLtoDOCX(html, null, {
-    font: 'Calibri',
+    font: 'Arial',
     fontSize: 18, // 9pt = 18 half-points
     margins: { top: 720, right: 720, bottom: 720, left: 720 }, // 0.5in in twips
     orientation: 'portrait',
