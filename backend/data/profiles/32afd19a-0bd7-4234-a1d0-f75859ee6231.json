@@ -2,7 +2,7 @@
   "name": "Jackson Prange",
   "title": "Senior Software Engineer",
   "totalYearsExperience": 9,
-  "preferredTemplate": "",
+  "preferredTemplate": "default",
   "disabled": false,
   "contact": {
     "phone": "‪(564) 225-2672‬",
@@ -57,5 +57,5 @@
   "certifications": [],
   "id": "32afd19a-0bd7-4234-a1d0-f75859ee6231",
   "createdAt": "2026-02-22T15:55:03.412Z",
-  "updatedAt": "2026-02-22T15:55:03.412Z"
+  "updatedAt": "2026-02-22T23:54:57.505Z"
 }

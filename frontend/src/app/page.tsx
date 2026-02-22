@@ -263,6 +263,7 @@ export default function Home() {
                 selectedId={selectedTemplateId}
                 onChange={setSelectedTemplateId}
                 isLoading={isLoadingData || templates.length === 0}
+                disabled={!!profiles.find((p) => p.id === selectedProfileId)?.preferredTemplate}
               />
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">

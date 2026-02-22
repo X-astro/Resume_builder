@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Profile, CreateProfileDTO, Experience, Strength, Education } from '@/lib/api';
+import { useState, useEffect } from 'react';
+import { Profile, CreateProfileDTO, Experience, Strength, Education, templatesApi, Template } from '@/lib/api';
 
 interface ProfileFormProps {
   initialData?: Profile;
@@ -13,6 +13,7 @@ interface ManualProfileFormData {
   name: string;
   title: string;
   totalYearsExperience: string;
+  preferredTemplate: string;
   contact: {
     phone: string;
     email: string;
@@ -47,6 +48,7 @@ export default function ProfileForm({
       typeof initialData?.totalYearsExperience === 'number'
         ? String(initialData.totalYearsExperience)
         : '',
+    preferredTemplate: initialData?.preferredTemplate || '',
     contact: initialData?.contact || {
       phone: '',
       email: '',
@@ -64,6 +66,11 @@ export default function ProfileForm({
 
   const [hardSkillInput, setHardSkillInput] = useState('');
   const [softSkillInput, setSoftSkillInput] = useState('');
+  const [templates, setTemplates] = useState<Template[]>([]);
+
+  useEffect(() => {
+    templatesApi.getAll().then(setTemplates).catch(() => setTemplates([]));
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,6 +89,7 @@ export default function ProfileForm({
           typeof parsedYears === 'number' && Number.isFinite(parsedYears) && parsedYears >= 0
             ? parsedYears
             : undefined,
+        preferredTemplate: formData.preferredTemplate || undefined,
         skills: formData.hardSkills,
       });
     } catch (err) {
@@ -263,6 +271,28 @@ export default function ProfileForm({
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="e.g., 4"
             />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Default Template
+            </label>
+            <select
+              value={formData.preferredTemplate}
+              onChange={(e) =>
+                setFormData({ ...formData, preferredTemplate: e.target.value })
+              }
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">None (select in builder)</option>
+              {templates.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name}
+                </option>
+              ))}
+            </select>
+            <p className="mt-1 text-xs text-gray-500">
+              When set, this template is used automatically when building resumes for this profile.
+            </p>
           </div>
         </div>
       </div>
