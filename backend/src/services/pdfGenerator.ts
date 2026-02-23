@@ -422,7 +422,7 @@ export function prepareResumeRenderData(
     ...profile,
     companyName: companyName || '',
     role: role || '',
-    title: sanitizeTitleForATS(tailoredContent?.title ?? getResumeTitle(profile)),
+    title: sanitizeTitleForATS(getResumeTitle(profile)),
     ...(tailoredContent && {
       summary: tailoredContent.summary,
       experience: tailoredContent.experience,

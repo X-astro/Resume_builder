@@ -2,7 +2,7 @@
   "name": "Charles Cordova",
   "title": "Senior Software Engineer",
   "totalYearsExperience": 11,
-  "preferredTemplate": "",
+  "preferredTemplate": "one-column",
   "disabled": false,
   "contact": {
     "phone": "‪(564) 225-2703‬",
@@ -66,5 +66,5 @@
   "certifications": [],
   "id": "993f577c-af3a-4e87-ab0b-f0b8dc3b57e1",
   "createdAt": "2026-02-22T15:15:04.085Z",
-  "updatedAt": "2026-02-22T15:20:10.003Z"
+  "updatedAt": "2026-02-23T00:00:56.239Z"
 }

@@ -2,7 +2,7 @@
   "name": "Hayato Gibbons",
   "title": "Senior Software Engineer",
   "totalYearsExperience": 9,
-  "preferredTemplate": "",
+  "preferredTemplate": "one-column-modern",
   "disabled": false,
   "contact": {
     "phone": "‪(202) 656-8065‬",
@@ -83,5 +83,5 @@
   "certifications": [],
   "id": "99f67fb0-ecc0-48ad-a31b-88b0cfc74ce2",
   "createdAt": "2026-02-20T13:29:27.925Z",
-  "updatedAt": "2026-02-22T14:47:14.618Z"
+  "updatedAt": "2026-02-23T00:00:48.801Z"
 }
