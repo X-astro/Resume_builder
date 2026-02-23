@@ -14,7 +14,7 @@ function sanitizeFilename(str: string): string {
 }
 
 export interface GeneratedPathInfo {
-  /** Relative path base: {profile}/{date}/{count+1}_{company}/{role} */
+  /** Relative path base: {profile}/{date}/{company}/{role} */
   relativeBase: string;
   /** Absolute directory for writing files */
   absoluteDir: string;
@@ -25,8 +25,7 @@ export interface GeneratedPathInfo {
 
 /**
  * Compute output path for generated files.
- * Structure: {profile}/{date}/{count+1}_{company}/{role}/
- * Count = number of folders in {profile}/{date}, then create {count+1}_{companyname}
+ * Structure: {profile}/{date}/{company}/{role}/
  */
 export async function getGeneratedOutputPath(
   profile: Profile,
@@ -34,20 +33,10 @@ export async function getGeneratedOutputPath(
   role: string
 ): Promise<GeneratedPathInfo> {
   const profileSlug = sanitizeFilename(profile.name) || 'unknown';
-  const companySlug = sanitizeFilename(companyName || 'unknown');
+  const companyFolderName = sanitizeFilename(companyName || 'unknown');
   const roleSlug = sanitizeFilename(role || 'resume');
   const dateStr = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 
-  const profileDateDir = path.join(GENERATED_DIR, profileSlug, dateStr);
-  let count = 0;
-  try {
-    const entries = await fs.readdir(profileDateDir, { withFileTypes: true });
-    count = entries.filter((e) => e.isDirectory()).length;
-  } catch {
-    // Profile/date dir doesn't exist yet, count stays 0
-  }
-
-  const companyFolderName = `${String(count + 1).padStart(3, '0')}_${companySlug}`;
   const relativeBase = `${profileSlug}/${dateStr}/${companyFolderName}/${roleSlug}`;
   const absoluteDir = path.join(GENERATED_DIR, relativeBase);
 

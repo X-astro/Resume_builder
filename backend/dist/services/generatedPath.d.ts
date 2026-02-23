@@ -1,6 +1,6 @@
 import { Profile } from '../types/profile';
 export interface GeneratedPathInfo {
-    /** Relative path base: {profile}/{date}/{count+1}_{company}/{role} */
+    /** Relative path base: {profile}/{date}/{company}/{role} */
     relativeBase: string;
     /** Absolute directory for writing files */
     absoluteDir: string;
@@ -10,8 +10,7 @@ export interface GeneratedPathInfo {
 }
 /**
  * Compute output path for generated files.
- * Structure: {profile}/{date}/{count+1}_{company}/{role}/
- * Count = number of folders in {profile}/{date}, then create {count+1}_{companyname}
+ * Structure: {profile}/{date}/{company}/{role}/
  */
 export declare function getGeneratedOutputPath(profile: Profile, companyName: string, role: string): Promise<GeneratedPathInfo>;
 //# sourceMappingURL=generatedPath.d.ts.map
