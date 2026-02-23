@@ -4,6 +4,11 @@ declare const DEFAULT_PROVIDER: AIProvider;
 export declare function resolveAIProvider(model?: string): AIProvider;
 export declare function analyzeJobDescription(jobDescription: string, provider?: AIProvider): Promise<JobAnalysis>;
 export declare function tailorResume(profile: Profile, jobAnalysis: JobAnalysis, provider?: AIProvider): Promise<TailoredContent>;
+/**
+ * Generate a cover letter body when no job description is provided.
+ * Returns only the body text (no salutation or sign-off).
+ */
+export declare function generateCoverLetter(profile: Profile, companyName: string, role: string, provider?: AIProvider): Promise<string>;
 export declare function extractTemplateFromPDF(pdfText: string, templateName: string, provider?: AIProvider): Promise<{
     html: string;
     css: string;

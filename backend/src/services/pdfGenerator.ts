@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Profile } from '../types/profile';
 import { TailoredContent, Template } from '../types/template';
 import { GENERATED_RESUMES_DIR } from '../config/storage';
+import type { GeneratedPathInfo } from './generatedPath';
 
 const GENERATED_DIR = GENERATED_RESUMES_DIR;
 const MAX_ROLE_BRIEF_LENGTH = 450;
@@ -438,13 +439,19 @@ export function prepareResumeRenderData(
 export async function generateResumePDF(
   profile: Profile,
   template: Template,
-  tailoredContent?: TailoredContent,
+  tailoredContent: TailoredContent | undefined,
+  pathInfo: GeneratedPathInfo,
   companyName?: string,
   role?: string
 ): Promise<string> {
   await ensureGeneratedDir();
 
-  const renderData = prepareResumeRenderData(profile, tailoredContent, companyName, role);
+  const renderData = prepareResumeRenderData(
+    profile,
+    tailoredContent,
+    companyName,
+    role
+  );
 
   // Compile and render template
   const compiledTemplate = Handlebars.compile(template.htmlContent);
@@ -471,14 +478,9 @@ export async function generateResumePDF(
     await page.emulateMediaType('print');
     await page.setContent(fullHtml, { waitUntil: 'networkidle0' });
 
-    // Path: {profile_name}/{current_date}/{company}/{role}/{profile_name}.pdf
-    const profileSlug = sanitizeFilename(profile.name) || 'unknown';
-    const dateStr = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-    const companySlug = sanitizeFilename(companyName || 'unknown');
-    const roleSlug = sanitizeFilename(role || 'resume');
-    const pdfFilename = `${profileSlug}.pdf`;
-    const relativePath = `${profileSlug}/${dateStr}/${companySlug}/${roleSlug}/${pdfFilename}`;
-    const filepath = path.join(GENERATED_DIR, profileSlug, dateStr, companySlug, roleSlug, pdfFilename);
+    const pdfFilename = `${pathInfo.profileSlug}.pdf`;
+    const relativePath = `${pathInfo.relativeBase}/${pdfFilename}`;
+    const filepath = path.join(pathInfo.absoluteDir, pdfFilename);
     let finalPdf: Buffer | null = null;
 
     for (let attempt = 1; attempt <= SINGLE_PAGE_MAX_ATTEMPTS; attempt++) {

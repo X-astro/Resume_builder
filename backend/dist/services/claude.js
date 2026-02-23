@@ -7,6 +7,7 @@ exports.DEFAULT_PROVIDER = void 0;
 exports.resolveAIProvider = resolveAIProvider;
 exports.analyzeJobDescription = analyzeJobDescription;
 exports.tailorResume = tailorResume;
+exports.generateCoverLetter = generateCoverLetter;
 exports.extractTemplateFromPDF = extractTemplateFromPDF;
 exports.extractProfileFromResume = extractProfileFromResume;
 const openai_1 = __importDefault(require("openai"));
@@ -749,6 +750,13 @@ CRITICAL ATS OPTIMIZATION INSTRUCTIONS:
    - Use keywords from the job analysis
    - Focus on qualities mentioned in the job description
 
+7. COVER LETTER (coverLetter): Write a professional cover letter body (2–4 short paragraphs).
+   - Express genuine interest in the role and company
+   - Connect your experience and skills to the job requirements
+   - Mention 1–2 specific relevant achievements
+   - Keep tone professional, concise, and confident
+   - Do NOT include salutation ("Dear Hiring Manager") or sign-off ("Best regards")—only the body text
+
 RULES:
 - Do NOT invent work experience or companies
 - Use EXACT keyword phrases from the job description
@@ -760,9 +768,10 @@ Return a JSON object with these fields:
 - title: string (ATS-optimized title line)
 - summary: string (keyword-rich tailored summary with soft skill phrases woven in)
 - experience: array of { title, company, startDate, endDate, location, description, achievements }
- - hardSkills: array of strings (all relevant technical skills, no limit)
- - softSkills: array of strings (8-10 when available, max 10)
+- hardSkills: array of strings (all relevant technical skills, no limit)
+- softSkills: array of strings (8-10 when available, max 10)
 - strengths: array of { title, description }
+- coverLetter: string (cover letter body only, 2–4 paragraphs, no salutation or sign-off)
 
 Return ONLY valid JSON, no other text.`, provider, 4000, 0.7);
     try {
@@ -774,6 +783,30 @@ Return ONLY valid JSON, no other text.`, provider, 4000, 0.7);
         console.error('Failed to parse model response:', content);
         throw new Error('Failed to parse tailored resume response');
     }
+}
+/**
+ * Generate a cover letter body when no job description is provided.
+ * Returns only the body text (no salutation or sign-off).
+ */
+async function generateCoverLetter(profile, companyName, role, provider = DEFAULT_PROVIDER) {
+    const content = await createTextCompletion(`You are an expert cover letter writer. Write a professional cover letter BODY for the following candidate applying to a job.
+
+PROFILE:
+${JSON.stringify(profile, null, 2)}
+
+APPLICATION:
+- Company: ${companyName}
+- Role: ${role}
+
+INSTRUCTIONS:
+- Write 2–4 short paragraphs expressing interest in the role and company
+- Connect the candidate's experience and skills to the role
+- Mention 1–2 specific relevant achievements
+- Keep tone professional, concise, and confident
+- Do NOT include "Dear Hiring Manager", "Best regards", or any salutation/sign-off—ONLY the body paragraphs
+
+Return ONLY the cover letter body text, no JSON or other formatting.`, provider, 1500, 0.7);
+    return content.trim();
 }
 async function extractTemplateFromPDF(pdfText, templateName, provider = DEFAULT_PROVIDER) {
     const content = await createTextCompletion(`Analyze this resume text and create a Handlebars HTML template that replicates its structure and layout.

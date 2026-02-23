@@ -5,17 +5,7 @@ import HTMLtoDOCX from 'html-to-docx';
 import { Profile } from '../types/profile';
 import { TailoredContent } from '../types/template';
 import { prepareResumeRenderData } from './pdfGenerator';
-import { GENERATED_RESUMES_DIR } from '../config/storage';
-
-const GENERATED_DIR = GENERATED_RESUMES_DIR;
-
-function sanitizeFilename(str: string): string {
-  return str
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '_')
-    .replace(/^_|_$/g, '');
-}
+import type { GeneratedPathInfo } from './generatedPath';
 
 /**
  * Builds HTML in Daniel-style: Arial, centered header (name, title, contact),
@@ -129,6 +119,7 @@ function buildHayatoStyleHTML(data: ReturnType<typeof prepareResumeRenderData>):
 export async function generateResumeDOCX(
   profile: Profile,
   tailoredContent: TailoredContent | undefined,
+  pathInfo: GeneratedPathInfo,
   companyName: string,
   role: string
 ): Promise<string> {
@@ -142,13 +133,9 @@ export async function generateResumeDOCX(
     orientation: 'portrait',
   });
 
-  const profileSlug = sanitizeFilename(profile.name) || 'unknown';
-  const dateStr = new Date().toISOString().split('T')[0];
-  const companySlug = sanitizeFilename(companyName || 'unknown');
-  const roleSlug = sanitizeFilename(role || 'resume');
-  const docxFilename = `${profileSlug}.docx`;
-  const relativePath = `${profileSlug}/${dateStr}/${companySlug}/${roleSlug}/${docxFilename}`;
-  const filepath = path.join(GENERATED_DIR, profileSlug, dateStr, companySlug, roleSlug, docxFilename);
+  const docxFilename = `${pathInfo.profileSlug}.docx`;
+  const relativePath = `${pathInfo.relativeBase}/${docxFilename}`;
+  const filepath = path.join(pathInfo.absoluteDir, docxFilename);
 
   await fs.mkdir(path.dirname(filepath), { recursive: true });
   await fs.writeFile(filepath, Buffer.from(docxBuffer as ArrayBuffer));

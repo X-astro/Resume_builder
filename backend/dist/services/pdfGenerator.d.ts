@@ -1,5 +1,6 @@
 import { Profile } from '../types/profile';
 import { TailoredContent, Template } from '../types/template';
+import type { GeneratedPathInfo } from './generatedPath';
 export declare function prepareResumeRenderData(profile: Profile, tailoredContent?: TailoredContent, companyName?: string, role?: string): {
     summary: string;
     experience: import("../types/profile").Experience[];
@@ -21,7 +22,7 @@ export declare function prepareResumeRenderData(profile: Profile, tailoredConten
     createdAt: string;
     updatedAt: string;
 };
-export declare function generateResumePDF(profile: Profile, template: Template, tailoredContent?: TailoredContent, companyName?: string, role?: string): Promise<string>;
+export declare function generateResumePDF(profile: Profile, template: Template, tailoredContent: TailoredContent | undefined, pathInfo: GeneratedPathInfo, companyName?: string, role?: string): Promise<string>;
 export declare function generatePreviewHTML(profile: Profile, template: Template, tailoredContent?: TailoredContent): Promise<string>;
 export declare function getGeneratedPDFPath(filename: string): Promise<string | null>;
 //# sourceMappingURL=pdfGenerator.d.ts.map

@@ -9,15 +9,6 @@ const promises_1 = __importDefault(require("fs/promises"));
 const path_1 = __importDefault(require("path"));
 const html_to_docx_1 = __importDefault(require("html-to-docx"));
 const pdfGenerator_1 = require("./pdfGenerator");
-const storage_1 = require("../config/storage");
-const GENERATED_DIR = storage_1.GENERATED_RESUMES_DIR;
-function sanitizeFilename(str) {
-    return str
-        .trim()
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '_')
-        .replace(/^_|_$/g, '');
-}
 /**
  * Builds HTML in Daniel-style: Arial, centered header (name, title, contact),
  * blue accent (#2B5C8A), section headers with underline.
@@ -39,7 +30,7 @@ function buildHayatoStyleHTML(data) {
         contactParts.push(`<a href="${esc(data.contact.linkedin)}">${esc(data.contact.linkedin)}</a>`);
     const contactLine = contactParts.filter(Boolean).join('  •  ');
     const accentColor = '#2B5C8A';
-    const sectionStyle = `margin: 14pt 0 6pt 0; font-size: 11pt; font-weight: bold; color: ${accentColor}; border-bottom: 1px solid ${accentColor}; padding-bottom: 2pt;`;
+    const sectionStyle = `margin: 5pt 0 6pt 0; font-size: 11pt; font-weight: bold; color: ${accentColor}; border-bottom: 1px solid ${accentColor}; padding-bottom: 2pt;`;
     let html = `
 <!DOCTYPE html>
 <html>
@@ -49,7 +40,7 @@ function buildHayatoStyleHTML(data) {
     <p style="font-size: 20pt; font-weight: bold; color: #1A1A1A; margin: 0 0 5pt 0; text-align: center;">${esc(data.name)}</p>
     <p style="font-size: 12pt; font-weight: bold; color: ${accentColor}; margin: 0 0 5pt 0; text-align: center;">${esc(data.title)}</p>
     <p style="font-size: 9pt; color: #555555; margin: 0 0 14pt 0; text-align: center;">${contactLine}</p>
-    <p style="margin: 0 0 0 0;"><br></p>
+    <p style="margin: 0;"><br></p>
   </div>
 
   <p style="${sectionStyle}"><u>Professional Summary</u></p>
@@ -75,15 +66,14 @@ function buildHayatoStyleHTML(data) {
         const dates = [exp.startDate, exp.endDate].filter(Boolean).join(' – ');
         const loc = exp.location ? ` • ${exp.location}` : '';
         const bullets = (exp.achievements ?? [])
-            .map((a) => `<p style="margin: 0 0 4pt 0; font-size: 9pt; color: #1A1A1A; line-height: 1.35;">- ${esc(a)}</p>`)
+            .map((a) => `<p style="font-size: 9pt; color: #1A1A1A; line-height: 1.35;">- ${esc(a)}</p>`)
             .join('\n  ');
         return `
-  <p style="margin: 12pt 0 0; font-weight: bold; font-size: 11pt; color: #1A1A1A;">${esc(exp.company ?? '')}</p>
-  <p style="margin: 0 0 4pt 0; font-size: 10pt; color: ${accentColor}; font-style: italic;">${esc(exp.title ?? '')}</p>
-  <p style="margin: 0 0 4pt 0; font-size: 8pt; color: #555555;">${esc(dates)}${esc(loc)}</p>
-  <p style="margin: 0 0 4pt 0; font-size: 9pt; color: #1A1A1A; line-height: 1.35;">${esc(exp.description ?? '')}</p>
-  ${bullets}
-  <p style="margin: 0;"><br></p>`;
+  <p style="font-weight: bold; font-size: 11pt; color: #1A1A1A;">${esc(exp.company ?? '')}</p>
+  <p style="font-size: 10pt; color: ${accentColor}; font-style: italic;">${esc(exp.title ?? '')}</p>
+  <p style="font-size: 8pt; color: #555555;">${esc(dates)}${esc(loc)}</p>
+  <p style="font-size: 9pt; color: #1A1A1A; line-height: 1.35;">${esc(exp.description ?? '')}</p>
+  ${bullets}`;
     })
         .join('\n')}
   <p style="margin: 0;"><br></p>
@@ -94,17 +84,16 @@ function buildHayatoStyleHTML(data) {
         const dates = [edu.startDate, edu.endDate].filter(Boolean).join(' – ');
         const loc = edu.location ? ` • ${edu.location}` : '';
         return `
-  <p style="margin: 6pt 0 0; font-weight: bold; font-size: 10pt; color: #1A1A1A;">${esc(edu.degree ?? '')}</p>
-  <p style="margin: 0; font-size: 9pt; color: #555555;">${esc(edu.institution ?? '')}${esc(loc)}</p>
-  <p style="margin: 0 0 8pt 0; font-size: 8pt; color: #555555;">${esc(dates)}</p>
-  <p style="margin: 0;"><br></p>`;
+  <p style="font-weight: bold; font-size: 10pt; color: #1A1A1A;">${esc(edu.degree ?? '')}</p>
+  <p style="font-size: 9pt; color: #555555;">${esc(edu.institution ?? '')}${esc(loc)}</p>
+  <p style="font-size: 8pt; color: #555555;">${esc(dates)}</p>`;
     })
         .join('\n')}
 </body>
 </html>`;
     return html;
 }
-async function generateResumeDOCX(profile, tailoredContent, companyName, role) {
+async function generateResumeDOCX(profile, tailoredContent, pathInfo, companyName, role) {
     const renderData = (0, pdfGenerator_1.prepareResumeRenderData)(profile, tailoredContent, companyName, role);
     const html = buildHayatoStyleHTML(renderData);
     const docxBuffer = await (0, html_to_docx_1.default)(html, null, {
@@ -113,13 +102,9 @@ async function generateResumeDOCX(profile, tailoredContent, companyName, role) {
         margins: { top: 720, right: 720, bottom: 720, left: 720 }, // 0.5in in twips
         orientation: 'portrait',
     });
-    const profileSlug = sanitizeFilename(profile.name) || 'unknown';
-    const dateStr = new Date().toISOString().split('T')[0];
-    const companySlug = sanitizeFilename(companyName || 'unknown');
-    const roleSlug = sanitizeFilename(role || 'resume');
-    const docxFilename = `${profileSlug}.docx`;
-    const relativePath = `${profileSlug}/${dateStr}/${companySlug}/${roleSlug}/${docxFilename}`;
-    const filepath = path_1.default.join(GENERATED_DIR, profileSlug, dateStr, companySlug, roleSlug, docxFilename);
+    const docxFilename = `${pathInfo.profileSlug}.docx`;
+    const relativePath = `${pathInfo.relativeBase}/${docxFilename}`;
+    const filepath = path_1.default.join(pathInfo.absoluteDir, docxFilename);
     await promises_1.default.mkdir(path_1.default.dirname(filepath), { recursive: true });
     await promises_1.default.writeFile(filepath, Buffer.from(docxBuffer));
     return relativePath;

@@ -49,6 +49,7 @@ export default function TemplateSelector({
           <option key={template.id} value={template.id}>
             {template.name}
             {template.id === 'default' ? ' (Default)' : ''}
+            {template.id.startsWith('m/') ? ' (m)' : ''}
           </option>
         ))}
       </select>

@@ -9,6 +9,8 @@ const path_1 = __importDefault(require("path"));
 const claude_1 = require("../services/claude");
 const pdfGenerator_1 = require("../services/pdfGenerator");
 const docxGenerator_1 = require("../services/docxGenerator");
+const coverLetterGenerator_1 = require("../services/coverLetterGenerator");
+const generatedPath_1 = require("../services/generatedPath");
 const templateExtractor_1 = require("../services/templateExtractor");
 const aiModelConfig_1 = require("../services/aiModelConfig");
 const router = (0, express_1.Router)();
@@ -105,25 +107,37 @@ router.post('/generate', async (req, res) => {
             tailoredContent = await (0, claude_1.tailorResume)(profile, analysis, selectedModel);
         }
         const generateBoth = format === 'both';
+        // Get cover letter body: from tailored content or generate when no job description
+        let coverLetterBody;
+        if (tailoredContent?.coverLetter?.trim()) {
+            coverLetterBody = tailoredContent.coverLetter.trim();
+        }
+        else {
+            coverLetterBody = await (0, claude_1.generateCoverLetter)(profile, companyName.trim(), role.trim(), selectedModel);
+        }
+        const pathInfo = await (0, generatedPath_1.getGeneratedOutputPath)(profile, companyName.trim(), role.trim());
+        const coverLetterPath = await (0, coverLetterGenerator_1.saveCoverLetter)(profile, coverLetterBody, pathInfo);
         if (generateBoth) {
             const [pdfFilename, docxFilename] = await Promise.all([
-                (0, pdfGenerator_1.generateResumePDF)(profile, template, tailoredContent, companyName.trim(), role.trim()),
-                (0, docxGenerator_1.generateResumeDOCX)(profile, tailoredContent, companyName.trim(), role.trim()),
+                (0, pdfGenerator_1.generateResumePDF)(profile, template, tailoredContent, pathInfo, companyName.trim(), role.trim()),
+                (0, docxGenerator_1.generateResumeDOCX)(profile, tailoredContent, pathInfo, companyName.trim(), role.trim()),
             ]);
             res.json({
                 pdf: { filename: pdfFilename, downloadUrl: `/api/generated/${pdfFilename}` },
                 docx: { filename: docxFilename, downloadUrl: `/api/generated/${docxFilename}` },
+                coverLetter: { filename: coverLetterPath, downloadUrl: `/api/generated/${coverLetterPath}` },
                 tailored: !!tailoredContent,
             });
         }
         else {
             const formatNorm = format === 'docx' ? 'docx' : 'pdf';
             const filename = formatNorm === 'docx'
-                ? await (0, docxGenerator_1.generateResumeDOCX)(profile, tailoredContent, companyName.trim(), role.trim())
-                : await (0, pdfGenerator_1.generateResumePDF)(profile, template, tailoredContent, companyName.trim(), role.trim());
+                ? await (0, docxGenerator_1.generateResumeDOCX)(profile, tailoredContent, pathInfo, companyName.trim(), role.trim())
+                : await (0, pdfGenerator_1.generateResumePDF)(profile, template, tailoredContent, pathInfo, companyName.trim(), role.trim());
             res.json({
                 filename,
                 downloadUrl: `/api/generated/${filename}`,
+                coverLetter: { filename: coverLetterPath, downloadUrl: `/api/generated/${coverLetterPath}` },
                 tailored: !!tailoredContent,
                 format: formatNorm
             });

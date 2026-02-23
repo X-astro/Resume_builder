@@ -382,7 +382,7 @@ function prepareResumeRenderData(profile, tailoredContent, companyName, role) {
         ...profile,
         companyName: companyName || '',
         role: role || '',
-        title: sanitizeTitleForATS(tailoredContent?.title ?? getResumeTitle(profile)),
+        title: sanitizeTitleForATS(getResumeTitle(profile)),
         ...(tailoredContent && {
             summary: tailoredContent.summary,
             experience: tailoredContent.experience,
@@ -394,7 +394,7 @@ function prepareResumeRenderData(profile, tailoredContent, companyName, role) {
     };
     return normalizeExperienceDescriptions(applySkillsLimit(data));
 }
-async function generateResumePDF(profile, template, tailoredContent, companyName, role) {
+async function generateResumePDF(profile, template, tailoredContent, pathInfo, companyName, role) {
     await ensureGeneratedDir();
     const renderData = prepareResumeRenderData(profile, tailoredContent, companyName, role);
     // Compile and render template
@@ -418,14 +418,9 @@ async function generateResumePDF(profile, template, tailoredContent, companyName
         });
         await page.emulateMediaType('print');
         await page.setContent(fullHtml, { waitUntil: 'networkidle0' });
-        // Path: {profile_name}/{current_date}/{company}/{role}/{profile_name}.pdf
-        const profileSlug = sanitizeFilename(profile.name) || 'unknown';
-        const dateStr = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-        const companySlug = sanitizeFilename(companyName || 'unknown');
-        const roleSlug = sanitizeFilename(role || 'resume');
-        const pdfFilename = `${profileSlug}.pdf`;
-        const relativePath = `${profileSlug}/${dateStr}/${companySlug}/${roleSlug}/${pdfFilename}`;
-        const filepath = path_1.default.join(GENERATED_DIR, profileSlug, dateStr, companySlug, roleSlug, pdfFilename);
+        const pdfFilename = `${pathInfo.profileSlug}.pdf`;
+        const relativePath = `${pathInfo.relativeBase}/${pdfFilename}`;
+        const filepath = path_1.default.join(pathInfo.absoluteDir, pdfFilename);
         let finalPdf = null;
         for (let attempt = 1; attempt <= SINGLE_PAGE_MAX_ATTEMPTS; attempt++) {
             await enforceSinglePageFit(page);

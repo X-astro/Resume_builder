@@ -41,6 +41,8 @@ export interface TailoredContent {
   requiredSkills?: string[];
   preferredSkills?: string[];
   strengths: TailoredStrength[];
+  /** Cover letter body (content between "Dear Hiring Manager" and "Best regards") */
+  coverLetter?: string;
 }
 
 export interface TailoredExperience {
