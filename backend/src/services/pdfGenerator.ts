@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Profile } from '../types/profile';
 import { TailoredContent, Template } from '../types/template';
 import { GENERATED_RESUMES_DIR } from '../config/storage';
+import type { GeneratedPathInfo } from './generatedPath';
 
 const GENERATED_DIR = GENERATED_RESUMES_DIR;
 const MAX_ROLE_BRIEF_LENGTH = 450;
@@ -397,22 +398,33 @@ function countPdfPages(pdfBuffer: Buffer): number {
   return matches?.length ?? 1;
 }
 
-export async function generateResumePDF(
+function getResumeTitle(profile: Profile): string {
+  const profileTitle = profile.title?.trim();
+  if (profileTitle) return profileTitle;
+  const lastRole = profile.experience?.[0]?.title?.trim();
+  return lastRole || 'Professional';
+}
+
+/** Sanitize title for ATS: remove hyphens, periods, commas, and other symbols */
+function sanitizeTitleForATS(title: string): string {
+  return title
+    .replace(/[-.,;:'"()\[\]\/\\@#$%&*+=<>]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+export function prepareResumeRenderData(
   profile: Profile,
-  template: Template,
   tailoredContent?: TailoredContent,
   companyName?: string,
   role?: string
-): Promise<string> {
-  await ensureGeneratedDir();
-
-  // Merge profile with tailored content
+) {
   const data = {
     ...profile,
     companyName: companyName || '',
     role: role || '',
+    title: sanitizeTitleForATS(getResumeTitle(profile)),
     ...(tailoredContent && {
-      title: tailoredContent.title,
       summary: tailoredContent.summary,
       experience: tailoredContent.experience,
       skills: tailoredContent.skills || [],
@@ -421,8 +433,25 @@ export async function generateResumePDF(
       strengths: tailoredContent.strengths
     })
   };
+  return normalizeExperienceDescriptions(applySkillsLimit(data));
+}
 
-  const renderData = normalizeExperienceDescriptions(applySkillsLimit(data));
+export async function generateResumePDF(
+  profile: Profile,
+  template: Template,
+  tailoredContent: TailoredContent | undefined,
+  pathInfo: GeneratedPathInfo,
+  companyName?: string,
+  role?: string
+): Promise<string> {
+  await ensureGeneratedDir();
+
+  const renderData = prepareResumeRenderData(
+    profile,
+    tailoredContent,
+    companyName,
+    role
+  );
 
   // Compile and render template
   const compiledTemplate = Handlebars.compile(template.htmlContent);
@@ -449,14 +478,9 @@ export async function generateResumePDF(
     await page.emulateMediaType('print');
     await page.setContent(fullHtml, { waitUntil: 'networkidle0' });
 
-    // Path: {profile_name}/{current_date}/{company}/{role}/{profile_name}.pdf
-    const profileSlug = sanitizeFilename(profile.name) || 'unknown';
-    const dateStr = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-    const companySlug = sanitizeFilename(companyName || 'unknown');
-    const roleSlug = sanitizeFilename(role || 'resume');
-    const pdfFilename = `${profileSlug}.pdf`;
-    const relativePath = `${profileSlug}/${dateStr}/${companySlug}/${roleSlug}/${pdfFilename}`;
-    const filepath = path.join(GENERATED_DIR, profileSlug, dateStr, companySlug, roleSlug, pdfFilename);
+    const pdfFilename = `${pathInfo.profileSlug}.pdf`;
+    const relativePath = `${pathInfo.relativeBase}/${pdfFilename}`;
+    const filepath = path.join(pathInfo.absoluteDir, pdfFilename);
     let finalPdf: Buffer | null = null;
 
     for (let attempt = 1; attempt <= SINGLE_PAGE_MAX_ATTEMPTS; attempt++) {
@@ -516,21 +540,7 @@ export async function generatePreviewHTML(
   template: Template,
   tailoredContent?: TailoredContent
 ): Promise<string> {
-  // Merge profile with tailored content
-  const data = {
-    ...profile,
-    ...(tailoredContent && {
-      title: tailoredContent.title,
-      summary: tailoredContent.summary,
-      experience: tailoredContent.experience,
-      skills: tailoredContent.skills || [],
-      hardSkills: tailoredContent.hardSkills || [],
-      softSkills: tailoredContent.softSkills || [],
-      strengths: tailoredContent.strengths
-    })
-  };
-
-  const renderData = normalizeExperienceDescriptions(applySkillsLimit(data));
+  const renderData = prepareResumeRenderData(profile, tailoredContent);
 
   // Compile and render template
   const compiledTemplate = Handlebars.compile(template.htmlContent);

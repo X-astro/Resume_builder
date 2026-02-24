@@ -7,6 +7,7 @@ interface TemplateSelectorProps {
   selectedId: string | null;
   onChange: (id: string) => void;
   isLoading?: boolean;
+  disabled?: boolean;
 }
 
 export default function TemplateSelector({
@@ -14,7 +15,24 @@ export default function TemplateSelector({
   selectedId,
   onChange,
   isLoading,
+  disabled = false,
 }: TemplateSelectorProps) {
+  const selectedTemplate = templates.find((t) => t.id === selectedId);
+
+  if (disabled) {
+    return (
+      <div>
+        <label className="block text-sm font-medium text-black mb-2">
+          Template
+        </label>
+        <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700">
+          {selectedTemplate ? selectedTemplate.name : selectedId || '—'}
+        </div>
+        <p className="mt-1 text-xs text-gray-500">Using profile&apos;s default template</p>
+      </div>
+    );
+  }
+
   return (
     <div>
       <label className="block text-sm font-medium text-black mb-2">
@@ -31,6 +49,7 @@ export default function TemplateSelector({
           <option key={template.id} value={template.id}>
             {template.name}
             {template.id === 'default' ? ' (Default)' : ''}
+            {template.id.startsWith('m/') ? ' (m)' : ''}
           </option>
         ))}
       </select>

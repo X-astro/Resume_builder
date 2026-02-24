@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react';
 import { templatesApi, Template } from '@/lib/api';
 
 export default function TemplatesPage() {
-  const BUILT_IN_TEMPLATE_IDS = ['default', 'one-column', 'one-column-modern', 'one-column-executive', 'one-column-navy-classic'];
   const [templates, setTemplates] = useState<Template[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
@@ -315,11 +314,6 @@ export default function TemplatesPage() {
                     {template.name}
                   </h3>
                   <div className="flex flex-wrap gap-1 mt-1">
-                    {BUILT_IN_TEMPLATE_IDS.includes(template.id) && (
-                      <span className="inline-block px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded">
-                        Built-in
-                      </span>
-                    )}
                     {template.disabled && (
                       <span className="inline-block px-2 py-0.5 bg-gray-200 text-gray-700 text-xs rounded">
                         Disabled
@@ -356,14 +350,12 @@ export default function TemplatesPage() {
                 >
                   {template.disabled ? 'Enable' : 'Disable'}
                 </button>
-                {!BUILT_IN_TEMPLATE_IDS.includes(template.id) && (
-                  <button
-                    onClick={() => handleDelete(template.id)}
-                    className="px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded"
-                  >
-                    Delete
-                  </button>
-                )}
+                <button
+                  onClick={() => handleDelete(template.id)}
+                  className="px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded"
+                >
+                  Delete
+                </button>
               </div>
             </div>
           ))}

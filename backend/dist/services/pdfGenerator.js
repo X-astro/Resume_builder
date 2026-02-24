@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.prepareResumeRenderData = prepareResumeRenderData;
 exports.generateResumePDF = generateResumePDF;
 exports.generatePreviewHTML = generatePreviewHTML;
 exports.getGeneratedPDFPath = getGeneratedPDFPath;
@@ -362,15 +363,27 @@ function countPdfPages(pdfBuffer) {
     const matches = content.match(/\/Type\s*\/Page\b/g);
     return matches?.length ?? 1;
 }
-async function generateResumePDF(profile, template, tailoredContent, companyName, role) {
-    await ensureGeneratedDir();
-    // Merge profile with tailored content
+function getResumeTitle(profile) {
+    const profileTitle = profile.title?.trim();
+    if (profileTitle)
+        return profileTitle;
+    const lastRole = profile.experience?.[0]?.title?.trim();
+    return lastRole || 'Professional';
+}
+/** Sanitize title for ATS: remove hyphens, periods, commas, and other symbols */
+function sanitizeTitleForATS(title) {
+    return title
+        .replace(/[-.,;:'"()\[\]\/\\@#$%&*+=<>]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+function prepareResumeRenderData(profile, tailoredContent, companyName, role) {
     const data = {
         ...profile,
         companyName: companyName || '',
         role: role || '',
+        title: sanitizeTitleForATS(getResumeTitle(profile)),
         ...(tailoredContent && {
-            title: tailoredContent.title,
             summary: tailoredContent.summary,
             experience: tailoredContent.experience,
             skills: tailoredContent.skills || [],
@@ -379,7 +392,11 @@ async function generateResumePDF(profile, template, tailoredContent, companyName
             strengths: tailoredContent.strengths
         })
     };
-    const renderData = normalizeExperienceDescriptions(applySkillsLimit(data));
+    return normalizeExperienceDescriptions(applySkillsLimit(data));
+}
+async function generateResumePDF(profile, template, tailoredContent, pathInfo, companyName, role) {
+    await ensureGeneratedDir();
+    const renderData = prepareResumeRenderData(profile, tailoredContent, companyName, role);
     // Compile and render template
     const compiledTemplate = handlebars_1.default.compile(template.htmlContent);
     const html = compiledTemplate(renderData);
@@ -401,14 +418,9 @@ async function generateResumePDF(profile, template, tailoredContent, companyName
         });
         await page.emulateMediaType('print');
         await page.setContent(fullHtml, { waitUntil: 'networkidle0' });
-        // Path: {profile_name}/{current_date}/{company}/{role}/{profile_name}.pdf
-        const profileSlug = sanitizeFilename(profile.name) || 'unknown';
-        const dateStr = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-        const companySlug = sanitizeFilename(companyName || 'unknown');
-        const roleSlug = sanitizeFilename(role || 'resume');
-        const pdfFilename = `${profileSlug}.pdf`;
-        const relativePath = `${profileSlug}/${dateStr}/${companySlug}/${roleSlug}/${pdfFilename}`;
-        const filepath = path_1.default.join(GENERATED_DIR, profileSlug, dateStr, companySlug, roleSlug, pdfFilename);
+        const pdfFilename = `${pathInfo.profileSlug}.pdf`;
+        const relativePath = `${pathInfo.relativeBase}/${pdfFilename}`;
+        const filepath = path_1.default.join(pathInfo.absoluteDir, pdfFilename);
         let finalPdf = null;
         for (let attempt = 1; attempt <= SINGLE_PAGE_MAX_ATTEMPTS; attempt++) {
             await enforceSinglePageFit(page);
@@ -454,20 +466,7 @@ async function generateResumePDF(profile, template, tailoredContent, companyName
     }
 }
 async function generatePreviewHTML(profile, template, tailoredContent) {
-    // Merge profile with tailored content
-    const data = {
-        ...profile,
-        ...(tailoredContent && {
-            title: tailoredContent.title,
-            summary: tailoredContent.summary,
-            experience: tailoredContent.experience,
-            skills: tailoredContent.skills || [],
-            hardSkills: tailoredContent.hardSkills || [],
-            softSkills: tailoredContent.softSkills || [],
-            strengths: tailoredContent.strengths
-        })
-    };
-    const renderData = normalizeExperienceDescriptions(applySkillsLimit(data));
+    const renderData = prepareResumeRenderData(profile, tailoredContent);
     // Compile and render template
     const compiledTemplate = handlebars_1.default.compile(template.htmlContent);
     const html = compiledTemplate(renderData);

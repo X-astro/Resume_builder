@@ -41,6 +41,8 @@ export interface TailoredContent {
   requiredSkills?: string[];
   preferredSkills?: string[];
   strengths: TailoredStrength[];
+  /** Cover letter body (content between "Dear Hiring Manager" and "Best regards") */
+  coverLetter?: string;
 }
 
 export interface TailoredExperience {
@@ -58,6 +60,8 @@ export interface TailoredStrength {
   description: string;
 }
 
+export type ResumeFormat = 'pdf' | 'docx' | 'both';
+
 export interface GenerateResumeRequest {
   profileId: string;
   templateId: string;
@@ -66,4 +70,5 @@ export interface GenerateResumeRequest {
   model?: AIProvider;
   companyName: string;
   role: string;
+  format?: ResumeFormat;
 }

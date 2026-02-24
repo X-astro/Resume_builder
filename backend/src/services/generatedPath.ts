@@ -1,0 +1,45 @@
+import fs from 'fs/promises';
+import path from 'path';
+import { Profile } from '../types/profile';
+import { GENERATED_RESUMES_DIR } from '../config/storage';
+
+const GENERATED_DIR = GENERATED_RESUMES_DIR;
+
+function sanitizeFilename(str: string): string {
+  return str
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_|_$/g, '');
+}
+
+export interface GeneratedPathInfo {
+  /** Relative path base: {profile}/{date}/{company}/{role} */
+  relativeBase: string;
+  /** Absolute directory for writing files */
+  absoluteDir: string;
+  profileSlug: string;
+  companyFolderName: string;
+  roleSlug: string;
+}
+
+/**
+ * Compute output path for generated files.
+ * Structure: {profile}/{date}/{company}/{role}/
+ */
+export async function getGeneratedOutputPath(
+  profile: Profile,
+  companyName: string,
+  role: string
+): Promise<GeneratedPathInfo> {
+  const profileSlug = sanitizeFilename(profile.name) || 'unknown';
+  const companyFolderName = sanitizeFilename(companyName || 'unknown');
+  const roleSlug = sanitizeFilename(role || 'resume');
+  // Use CST (America/Chicago) for folder date
+  const dateStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' }); // YYYY-MM-DD
+
+  const relativeBase = `${profileSlug}/${dateStr}/${companyFolderName}/${roleSlug}`;
+  const absoluteDir = path.join(GENERATED_DIR, relativeBase);
+
+  return { relativeBase, absoluteDir, profileSlug, companyFolderName, roleSlug };
+}

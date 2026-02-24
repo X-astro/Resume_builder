@@ -1,8 +1,11 @@
 import { Router, Request, Response } from 'express';
 import fs from 'fs/promises';
 import path from 'path';
-import { analyzeJobDescription, tailorResume, resolveAIProvider } from '../services/claude';
+import { analyzeJobDescription, tailorResume, generateCoverLetter, resolveAIProvider } from '../services/claude';
 import { generateResumePDF, generatePreviewHTML, getGeneratedPDFPath } from '../services/pdfGenerator';
+import { generateResumeDOCX } from '../services/docxGenerator';
+import { saveCoverLetter } from '../services/coverLetterGenerator';
+import { getGeneratedOutputPath } from '../services/generatedPath';
 import { getTemplateById, createDefaultTemplate } from '../services/templateExtractor';
 import { getAIModelSettings, getDefaultEnabledProvider, isProviderEnabled } from '../services/aiModelConfig';
 import { Profile } from '../types/profile';
@@ -46,7 +49,117 @@ router.post('/analyze', async (req: Request, res: Response) => {
   }
 });
 
-// Generate tailored resume
+// Load all non-disabled profiles
+async function loadAllProfiles(): Promise<Profile[]> {
+  const files = await fs.readdir(PROFILES_DIR);
+  const profiles: Profile[] = [];
+  for (const file of files) {
+    if (file.endsWith('.json')) {
+      try {
+        const content = await fs.readFile(path.join(PROFILES_DIR, file), 'utf-8');
+        const profile = JSON.parse(content);
+        if (!profile.disabled) profiles.push(profile);
+      } catch {
+        // Skip invalid profile files
+      }
+    }
+  }
+  return profiles.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+}
+
+// Generate for all profiles at once
+router.post('/generate-all', async (req: Request, res: Response) => {
+  try {
+    const {
+      templateId,
+      jobDescription,
+      jobAnalysis,
+      companyName,
+      role,
+      model,
+      format = 'both'
+    } = req.body;
+
+    const settings = await getAIModelSettings();
+    const selectedModel = resolveAIProvider(model);
+    if (!isProviderEnabled(selectedModel, settings)) {
+      res.status(400).json({ error: `Selected AI model '${selectedModel}' is disabled by admin` });
+      return;
+    }
+    if (!companyName?.trim()) {
+      res.status(400).json({ error: 'Company name is required' });
+      return;
+    }
+    if (!role?.trim()) {
+      res.status(400).json({ error: 'Role is required' });
+      return;
+    }
+
+    const profiles = await loadAllProfiles();
+    if (profiles.length === 0) {
+      res.status(400).json({ error: 'No profiles available. Add profiles in Admin.' });
+      return;
+    }
+
+    await createDefaultTemplate();
+
+    let analysis: import('../types/template').JobAnalysis | undefined;
+    if (jobDescription?.trim().length > 50) {
+      analysis = jobAnalysis || await analyzeJobDescription(jobDescription, selectedModel);
+    }
+
+    const results: { profileId: string; profileName: string; pdf?: string; docx?: string; coverLetter?: string }[] = [];
+    const formatNorm = (format as string) === 'both' ? 'both' : format === 'docx' ? 'docx' : 'pdf';
+
+    for (const profile of profiles) {
+      const profileTemplateId = profile.preferredTemplate || templateId || 'default';
+      let template = await getTemplateById(profileTemplateId);
+      if (!template || template.disabled) template = await getTemplateById('default');
+      if (!template || template.disabled) {
+        res.status(500).json({ error: 'Default template not available' });
+        return;
+      }
+
+      let tailoredContent;
+      if (analysis) {
+        tailoredContent = await tailorResume(profile, analysis, selectedModel);
+      }
+      let coverLetterBody: string;
+      if (tailoredContent?.coverLetter?.trim()) {
+        coverLetterBody = tailoredContent.coverLetter.trim();
+      } else {
+        coverLetterBody = await generateCoverLetter(profile, companyName.trim(), role.trim(), selectedModel);
+      }
+      const pathInfo = await getGeneratedOutputPath(profile, companyName.trim(), role.trim());
+      const coverLetterPath = await saveCoverLetter(profile, coverLetterBody, pathInfo);
+
+      const entry: (typeof results)[0] = { profileId: profile.id, profileName: profile.name, coverLetter: coverLetterPath };
+      if (formatNorm === 'both') {
+        const [pdfFilename, docxFilename] = await Promise.all([
+          generateResumePDF(profile, template, tailoredContent, pathInfo, companyName.trim(), role.trim()),
+          generateResumeDOCX(profile, tailoredContent, pathInfo, companyName.trim(), role.trim())
+        ]);
+        entry.pdf = pdfFilename;
+        entry.docx = docxFilename;
+      } else {
+        const filename = formatNorm === 'docx'
+          ? await generateResumeDOCX(profile, tailoredContent, pathInfo, companyName.trim(), role.trim())
+          : await generateResumePDF(profile, template, tailoredContent, pathInfo, companyName.trim(), role.trim());
+        entry[formatNorm] = filename;
+      }
+      results.push(entry);
+    }
+
+    res.json({ generated: results.length, results, tailored: !!analysis });
+  } catch (error) {
+    console.error('Error generating resumes for all profiles:', error);
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Failed to generate resumes'
+    });
+  }
+});
+
+// Generate tailored resume (single profile)
 router.post('/generate', async (req: Request, res: Response) => {
   try {
     const {
@@ -56,7 +169,8 @@ router.post('/generate', async (req: Request, res: Response) => {
       jobAnalysis,
       companyName,
       role,
-      model
+      model,
+      format = 'pdf'
     }: GenerateResumeRequest = req.body;
     const settings = await getAIModelSettings();
     const selectedModel = resolveAIProvider(model);
@@ -118,14 +232,54 @@ router.post('/generate', async (req: Request, res: Response) => {
       tailoredContent = await tailorResume(profile, analysis, selectedModel);
     }
 
-    // Generate PDF with company name and role
-    const filename = await generateResumePDF(profile, template, tailoredContent, companyName.trim(), role.trim());
+    const generateBoth = (format as string) === 'both';
 
-    res.json({
-      filename,
-      downloadUrl: `/api/generated/${filename}`,
-      tailored: !!tailoredContent
-    });
+    // Get cover letter body: from tailored content or generate when no job description
+    let coverLetterBody: string;
+    if (tailoredContent?.coverLetter?.trim()) {
+      coverLetterBody = tailoredContent.coverLetter.trim();
+    } else {
+      coverLetterBody = await generateCoverLetter(
+        profile,
+        companyName.trim(),
+        role.trim(),
+        selectedModel
+      );
+    }
+
+    const pathInfo = await getGeneratedOutputPath(
+      profile,
+      companyName.trim(),
+      role.trim()
+    );
+    const coverLetterPath = await saveCoverLetter(profile, coverLetterBody, pathInfo);
+
+    if (generateBoth) {
+      const [pdfFilename, docxFilename] = await Promise.all([
+        generateResumePDF(profile, template, tailoredContent, pathInfo, companyName.trim(), role.trim()),
+        generateResumeDOCX(profile, tailoredContent, pathInfo, companyName.trim(), role.trim()),
+      ]);
+      res.json({
+        pdf: { filename: pdfFilename, downloadUrl: `/api/generated/${pdfFilename}` },
+        docx: { filename: docxFilename, downloadUrl: `/api/generated/${docxFilename}` },
+        coverLetter: { filename: coverLetterPath, downloadUrl: `/api/generated/${coverLetterPath}` },
+        tailored: !!tailoredContent,
+      });
+    } else {
+      const formatNorm = format === 'docx' ? 'docx' : 'pdf';
+      const filename =
+        formatNorm === 'docx'
+          ? await generateResumeDOCX(profile, tailoredContent, pathInfo, companyName.trim(), role.trim())
+          : await generateResumePDF(profile, template, tailoredContent, pathInfo, companyName.trim(), role.trim());
+
+      res.json({
+        filename,
+        downloadUrl: `/api/generated/${filename}`,
+        coverLetter: { filename: coverLetterPath, downloadUrl: `/api/generated/${coverLetterPath}` },
+        tailored: !!tailoredContent,
+        format: formatNorm
+      });
+    }
   } catch (error) {
     console.error('Error generating resume:', error);
     res.status(500).json({
@@ -199,8 +353,8 @@ router.post('/preview', async (req: Request, res: Response) => {
   }
 });
 
-// Download generated PDF
-router.get('/download/:filename', async (req: Request<{ filename: string }>, res: Response) => {
+// Download generated resume (PDF or DOCX)
+router.get('/download/:filename(*)', async (req: Request<{ filename: string }>, res: Response) => {
   try {
     const filepath = await getGeneratedPDFPath(req.params.filename);
     if (!filepath) {
@@ -208,9 +362,14 @@ router.get('/download/:filename', async (req: Request<{ filename: string }>, res
       return;
     }
 
-    // Set headers to force download
-    res.setHeader('Content-Disposition', `attachment; filename="${req.params.filename}"`);
-    res.setHeader('Content-Type', 'application/pdf');
+    const ext = path.extname(req.params.filename).toLowerCase();
+    const contentType =
+      ext === '.docx'
+        ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        : 'application/pdf';
+
+    res.setHeader('Content-Disposition', `attachment; filename="${path.basename(req.params.filename)}"`);
+    res.setHeader('Content-Type', contentType);
     res.download(filepath);
   } catch (error) {
     res.status(500).json({ error: 'Failed to download file' });

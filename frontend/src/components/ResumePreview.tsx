@@ -2,8 +2,6 @@
 
 interface ResumePreviewProps {
   html: string;
-  downloadUrl: string | null;
-  onDownload: () => void;
   onGenerate: () => void;
   isGenerating: boolean;
   isTailored: boolean;
@@ -12,8 +10,6 @@ interface ResumePreviewProps {
 
 export default function ResumePreview({
   html,
-  downloadUrl,
-  onDownload,
   onGenerate,
   isGenerating,
   isTailored,
@@ -26,7 +22,7 @@ export default function ResumePreview({
           <h3 className="text-lg font-semibold text-gray-900">Resume Preview</h3>
           {isTailored && (
             <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
-              ATS Optimized
+              ATS OPTIMIZATION
             </span>
           )}
         </div>
@@ -63,27 +59,6 @@ export default function ResumePreview({
               'Generate Resume'
             )}
           </button>
-          {downloadUrl && (
-            <button
-              onClick={onDownload}
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition-colors flex items-center gap-2"
-            >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                />
-              </svg>
-              Download PDF
-            </button>
-          )}
         </div>
       </div>
 
