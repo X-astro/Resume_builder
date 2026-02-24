@@ -35,7 +35,8 @@ export async function getGeneratedOutputPath(
   const profileSlug = sanitizeFilename(profile.name) || 'unknown';
   const companyFolderName = sanitizeFilename(companyName || 'unknown');
   const roleSlug = sanitizeFilename(role || 'resume');
-  const dateStr = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+  // Use CST (America/Chicago) for folder date
+  const dateStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' }); // YYYY-MM-DD
 
   const relativeBase = `${profileSlug}/${dateStr}/${companyFolderName}/${roleSlug}`;
   const absoluteDir = path.join(GENERATED_DIR, relativeBase);

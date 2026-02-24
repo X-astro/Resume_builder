@@ -4,25 +4,20 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   profilesApi,
-  templatesApi,
   resumeApi,
   AIProvider,
   AIModelSettings,
   Profile,
   JobAnalysis,
-  Template,
 } from '@/lib/api';
 import ProfileSelector from '@/components/ProfileSelector';
-import TemplateSelector from '@/components/TemplateSelector';
-import SkillsExtracted from '@/components/SkillsExtracted';
-import ResumePreview from '@/components/ResumePreview';
+
+type GenerateMode = 'single' | 'multiple';
 
 export default function Home() {
-  // Data states
   const [profiles, setProfiles] = useState<Profile[]>([]);
-  const [templates, setTemplates] = useState<Template[]>([]);
   const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
-  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
+  const [generateMode, setGenerateMode] = useState<GenerateMode>('single');
   const [companyName, setCompanyName] = useState('');
   const [role, setRole] = useState('');
   const [jobDescription, setJobDescription] = useState('');
@@ -33,15 +28,11 @@ export default function Home() {
   });
   const [jobAnalysis, setJobAnalysis] = useState<JobAnalysis | null>(null);
 
-  // UI states
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationStep, setGenerationStep] = useState('');
   const [error, setError] = useState('');
-
-  // Preview states
-  const [previewHtml, setPreviewHtml] = useState('');
-  const [isTailored, setIsTailored] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     loadInitialData();
@@ -49,38 +40,19 @@ export default function Home() {
 
   const loadInitialData = async () => {
     try {
-      const [profilesData, templatesData] = await Promise.all([
-        profilesApi.getAll(),
-        templatesApi.getAll(),
+      const [profilesData, modelData] = await Promise.all([
+        profilesApi.getAll({ includeDisabled: true }),
+        resumeApi.getModels().catch(() => ({ openaiEnabled: true, claudeEnabled: true })),
       ]);
-      setProfiles(profilesData);
-      setTemplates(templatesData);
-      try {
-        const modelData = await resumeApi.getModels();
-        setModelSettings(modelData);
-        if (!modelData.openaiEnabled && modelData.claudeEnabled) {
-          setSelectedModel('claude');
-        } else if (modelData.openaiEnabled && !modelData.claudeEnabled) {
-          setSelectedModel('openai');
-        }
-      } catch {
-        setModelSettings({ openaiEnabled: true, claudeEnabled: true });
+      setProfiles(profilesData.filter((p) => !p.disabled));
+      setModelSettings(modelData);
+      if (!modelData.openaiEnabled && modelData.claudeEnabled) {
+        setSelectedModel('claude');
+      } else if (modelData.openaiEnabled && !modelData.claudeEnabled) {
+        setSelectedModel('openai');
       }
-
-      // Auto-select first profile
       if (profilesData.length > 0) {
-        const firstProfile = profilesData[0];
-        setSelectedProfileId(firstProfile.id);
-        const preferredTemplateExists = templatesData.some(
-          (template) => template.id === firstProfile.preferredTemplate
-        );
-        if (preferredTemplateExists && firstProfile.preferredTemplate) {
-          setSelectedTemplateId(firstProfile.preferredTemplate);
-        } else if (templatesData.some((template) => template.id === 'default')) {
-          setSelectedTemplateId('default');
-        } else if (templatesData.length > 0) {
-          setSelectedTemplateId(templatesData[0].id);
-        }
+        setSelectedProfileId(profilesData[0].id);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load data');
@@ -89,78 +61,65 @@ export default function Home() {
     }
   };
 
-  const handleProfileChange = (profileId: string) => {
-    setSelectedProfileId(profileId);
-    const selectedProfile = profiles.find((profile) => profile.id === profileId);
-    const preferredTemplateExists = templates.some(
-      (template) => template.id === selectedProfile?.preferredTemplate
-    );
-    if (preferredTemplateExists && selectedProfile?.preferredTemplate) {
-      setSelectedTemplateId(selectedProfile.preferredTemplate);
-    }
-  };
-
-  const handleGenerateResume = async () => {
-    if (!selectedProfileId) {
-      setError('Please select a profile');
-      return;
-    }
-
+  const handleGenerate = async () => {
     if (!companyName.trim()) {
       setError('Please enter a company name');
       return;
     }
-
     if (!role.trim()) {
       setError('Please enter a role');
       return;
     }
-
     if (jobDescription.trim().length < 50) {
       setError('Please provide a job description (minimum 50 characters)');
+      return;
+    }
+    if (generateMode === 'single' && !selectedProfileId) {
+      setError('Please select a profile');
+      return;
+    }
+    if (generateMode === 'multiple' && profiles.length === 0) {
+      setError('No profiles available');
       return;
     }
 
     setIsGenerating(true);
     setError('');
+    setSuccessMessage('');
     setJobAnalysis(null);
-    const templateId = selectedTemplateId || 'default';
 
     try {
-      let analysis: JobAnalysis | undefined;
-
-      // Step 1: Analyze job description
       setGenerationStep('Analyzing job description...');
-      analysis = await resumeApi.analyze(jobDescription, selectedModel);
+      const analysis = await resumeApi.analyze(jobDescription, selectedModel);
       setJobAnalysis(analysis);
 
-      // Step 2: Generate preview and PDF
-      setGenerationStep('Tailoring resume content...');
-
-      const previewResponse = await resumeApi.preview({
-        profileId: selectedProfileId,
-        templateId,
-        jobDescription,
-        jobAnalysis: analysis,
-        model: selectedModel,
-      });
-      setPreviewHtml(previewResponse.html);
-      setIsTailored(previewResponse.tailored);
-
-      setGenerationStep('Generating PDF and DOCX...');
-
-      const generateResponse = await resumeApi.generate({
-        profileId: selectedProfileId,
-        templateId,
-        jobDescription,
-        jobAnalysis: analysis,
-        companyName: companyName.trim(),
-        role: role.trim(),
-        model: selectedModel,
-        format: 'both',
-      });
-
-      setGenerationStep('');
+      if (generateMode === 'single') {
+        setGenerationStep('Generating resume...');
+        const profile = profiles.find((p) => p.id === selectedProfileId);
+        const templateId = profile?.preferredTemplate || 'default';
+        await resumeApi.generate({
+          profileId: selectedProfileId!,
+          templateId,
+          jobDescription,
+          jobAnalysis: analysis,
+          companyName: companyName.trim(),
+          role: role.trim(),
+          model: selectedModel,
+          format: 'both',
+        });
+        setSuccessMessage('Resume generated successfully.');
+      } else {
+        setGenerationStep(`Generating for ${profiles.length} profile(s)...`);
+        const res = await resumeApi.generateAll({
+          jobDescription,
+          jobAnalysis: analysis,
+          companyName: companyName.trim(),
+          role: role.trim(),
+          model: selectedModel,
+          format: 'both',
+        });
+        setSuccessMessage(`Generated ${res.generated} resume(s) successfully.`);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate resume');
     } finally {
@@ -200,155 +159,137 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">Generate Resumes</h1>
+
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-            {error}
-            <button
-              onClick={() => setError('')}
-              className="float-right text-red-700 hover:text-red-900"
-            >
+          <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex justify-between items-center">
+            <span>{error}</span>
+            <button onClick={() => setError('')} className="text-red-700 hover:text-red-900 font-bold">
               ×
             </button>
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left Column - Inputs */}
-          <div className="space-y-6">
-            {/* Profile Selection */}
-            <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                Resume Settings
-              </h2>
-              <ProfileSelector
-                profiles={profiles}
-                selectedId={selectedProfileId}
-                onChange={handleProfileChange}
-                isLoading={isLoadingData}
-              />
-              <TemplateSelector
-                templates={templates}
-                selectedId={selectedTemplateId}
-                onChange={setSelectedTemplateId}
-                isLoading={isLoadingData || templates.length === 0}
-                disabled={!!profiles.find((p) => p.id === selectedProfileId)?.preferredTemplate}
-              />
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  AI Model
-                </label>
-                <select
-                  value={selectedModel}
-                  onChange={(e) => setSelectedModel(e.target.value as AIProvider)}
-                  disabled={isGenerating}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                >
-                  {modelSettings.openaiEnabled && (
-                    <option value="openai">OpenAI</option>
-                  )}
-                  {modelSettings.claudeEnabled && (
-                    <option value="claude">Claude</option>
-                  )}
-                </select>
-              </div>
-            </div>
+        {successMessage && (
+          <div className="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+            {successMessage}
+          </div>
+        )}
 
-            {/* Job Details */}
-            <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                Job Details
-              </h2>
-              
-              {/* Company Name */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Company Name <span className="text-red-500">*</span>
-                </label>
+        <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
+          {/* Generate mode: single or multiple */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              Generate mode
+            </label>
+            <div className="flex gap-4">
+              <label className="flex items-center gap-2 cursor-pointer">
                 <input
-                  type="text"
-                  value={companyName}
-                  onChange={(e) => setCompanyName(e.target.value)}
+                  type="radio"
+                  name="generateMode"
+                  value="single"
+                  checked={generateMode === 'single'}
+                  onChange={() => setGenerateMode('single')}
                   disabled={isGenerating}
-                  placeholder="Enter company name"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  className="w-4 h-4 text-blue-600"
                 />
-              </div>
-              
-              {/* Role */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Role <span className="text-red-500">*</span>
-                </label>
+                <span>Single (one profile)</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
                 <input
-                  type="text"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
+                  type="radio"
+                  name="generateMode"
+                  value="multiple"
+                  checked={generateMode === 'multiple'}
+                  onChange={() => setGenerateMode('multiple')}
                   disabled={isGenerating}
-                  placeholder="Enter job role/title"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  className="w-4 h-4 text-blue-600"
                 />
-              </div>
-              
-              {/* Job Description */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Job Description <span className="text-red-500">*</span>
-                </label>
-                <p className="text-sm text-gray-600 mb-3">
-                  Paste the job description to automatically tailor your resume with
-                  relevant keywords for better ATS scoring.
-                </p>
-                <textarea
-                  value={jobDescription}
-                  onChange={(e) => setJobDescription(e.target.value)}
-                  disabled={isGenerating}
-                  placeholder="Paste the job description here..."
-                  rows={8}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y disabled:bg-gray-100 disabled:cursor-not-allowed"
-                />
-                <p className="text-sm text-gray-500 mt-2">
-                  {jobDescription.length > 0
-                    ? `${jobDescription.length} characters`
-                    : 'Minimum 50 characters for ATS optimization'}
-                </p>
-              </div>
+                <span>Multiple (all profiles)</span>
+              </label>
             </div>
-
-            {/* Job Analysis Results */}
-            {jobAnalysis && <SkillsExtracted analysis={jobAnalysis} />}
           </div>
 
-          {/* Right Column - Preview */}
+          {generateMode === 'single' && (
+            <ProfileSelector
+              profiles={profiles}
+              selectedId={selectedProfileId}
+              onChange={setSelectedProfileId}
+              isLoading={false}
+            />
+          )}
+
           <div>
-            <ResumePreview
-              html={previewHtml}
-              onGenerate={handleGenerateResume}
-              isGenerating={isGenerating}
-              isTailored={isTailored}
-              generationStep={generationStep}
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Company Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
+              disabled={isGenerating}
+              placeholder="Enter company name"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-        </div>
 
-        {/* Instructions */}
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-blue-900 mb-3">
-            How to Use
-          </h3>
-          <ol className="list-decimal list-inside space-y-2 text-blue-800">
-            <li>Select your profile from the dropdown</li>
-            <li>Select your preferred resume style from the template dropdown</li>
-            <li>
-              <strong>Optional:</strong> Paste a job description to enable ATS
-              optimization
-            </li>
-            <li>
-              Click &quot;Generate Resume&quot; - the system will automatically
-              analyze the job and create your tailored resume
-            </li>
-            <li>Download your ATS-optimized resume!</li>
-          </ol>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Role <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              disabled={isGenerating}
+              placeholder="Enter job role/title"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Job Description <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              value={jobDescription}
+              onChange={(e) => setJobDescription(e.target.value)}
+              disabled={isGenerating}
+              placeholder="Paste the job description (min 50 characters)"
+              rows={6}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
+            />
+            <p className="text-sm text-gray-500 mt-1">{jobDescription.length} characters</p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">AI Model</label>
+            <select
+              value={selectedModel}
+              onChange={(e) => setSelectedModel(e.target.value as AIProvider)}
+              disabled={isGenerating}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              {modelSettings.openaiEnabled && <option value="openai">OpenAI</option>}
+              {modelSettings.claudeEnabled && <option value="claude">Claude</option>}
+            </select>
+          </div>
+
+          <button
+            onClick={handleGenerate}
+            disabled={isGenerating}
+            className="w-full py-3 px-4 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            {isGenerating ? (
+              <>
+                <span className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></span>
+                {generationStep || 'Generating...'}
+              </>
+            ) : (
+              generateMode === 'single' ? 'Generate Resume' : `Generate All (${profiles.length} profiles)`
+            )}
+          </button>
         </div>
       </main>
 

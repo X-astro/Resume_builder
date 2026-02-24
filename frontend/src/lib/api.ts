@@ -323,7 +323,7 @@ export const resumeApi = {
   }) =>
     apiFetch<
       | { filename: string; downloadUrl: string; tailored: boolean; format?: 'pdf' | 'docx' }
-      | { pdf: { filename: string; downloadUrl: string }; docx: { filename: string; downloadUrl: string }; tailored: boolean }
+      | { pdf: { filename: string; downloadUrl: string }; docx: { filename: string; downloadUrl: string }; coverLetter?: { filename: string; downloadUrl: string }; tailored: boolean }
     >(
       '/resume/generate',
       {
@@ -331,6 +331,24 @@ export const resumeApi = {
         body: JSON.stringify(data),
       }
     ),
+
+  generateAll: (data: {
+    templateId?: string;
+    jobDescription?: string;
+    jobAnalysis?: JobAnalysis;
+    companyName: string;
+    role: string;
+    model: AIProvider;
+    format?: 'pdf' | 'docx' | 'both';
+  }) =>
+    apiFetch<{
+      generated: number;
+      results: Array<{ profileId: string; profileName: string; pdf?: string; docx?: string; coverLetter?: string }>;
+      tailored: boolean;
+    }>('/resume/generate-all', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
 
   preview: (data: {
     profileId: string;
