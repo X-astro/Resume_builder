@@ -1,6 +1,8 @@
 import puppeteer from 'puppeteer';
 import fs from 'fs/promises';
 import path from 'path';
+/// <reference path="../types/html-to-docx.d.ts" />
+import HTMLtoDOCX from 'html-to-docx';
 import { Profile } from '../types/profile';
 import type { GeneratedPathInfo } from './generatedPath';
 
@@ -35,6 +37,27 @@ function buildCoverLetterHTML(content: string, profileName: string): string {
   <p style="margin: 0 0 24pt 0;">Dear Hiring Manager,</p>
   ${contentToHtmlParagraphs(content)}
   <p style="margin: 24pt 0 12pt 0;">Best regards,</p>
+  <p style="margin: 0; font-weight: bold; color: ${accentColor}; font-size: 12pt;">${esc(profileName.trim())}</p>
+</body>
+</html>`;
+}
+
+/**
+ * Build cover letter HTML for DOCX with explicit line breaks between sections.
+ * Structure: Dear Hiring Manager, (line break), {content}, (line break), Best regards, {profile name}
+ */
+function buildCoverLetterHTMLForDocx(content: string, profileName: string): string {
+  const accentColor = '#2B5C8A';
+  const lineBreak = '<p style="margin: 0 0 12pt 0;"></p>';
+  return `<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body style="font-family: Arial, sans-serif; font-size: 11pt; color: #1A1A1A; line-height: 1.5;">
+  <p style="margin: 0 0 12pt 0;">Dear Hiring Manager,</p>
+  ${lineBreak}
+  ${contentToHtmlParagraphs(content)}
+  ${lineBreak}
+  <p style="margin: 0 0 12pt 0;">Best regards,</p>
   <p style="margin: 0; font-weight: bold; color: ${accentColor}; font-size: 12pt;">${esc(profileName.trim())}</p>
 </body>
 </html>`;
@@ -79,4 +102,32 @@ export async function saveCoverLetter(
   } finally {
     await browser.close();
   }
+}
+
+/**
+ * Save cover letter as DOCX in the same directory as the resume.
+ * Path: {profile}/{date}/{company}/{role}/{profile}_cover_letter.docx
+ */
+export async function saveCoverLetterDOCX(
+  profile: Profile,
+  content: string,
+  pathInfo: GeneratedPathInfo
+): Promise<string> {
+  const filename = `${pathInfo.profileSlug}_cover_letter.docx`;
+  const relativePath = `${pathInfo.relativeBase}/${filename}`;
+  const filepath = path.join(pathInfo.absoluteDir, filename);
+
+  const html = buildCoverLetterHTMLForDocx(content.trim(), profile.name);
+
+  const docxBuffer = await HTMLtoDOCX(html, null, {
+    font: 'Arial',
+    fontSize: 22, // 11pt = 22 half-points
+    margins: { top: 1080, right: 1080, bottom: 1080, left: 1080 }, // 0.75in in twips
+    orientation: 'portrait',
+  });
+
+  await fs.mkdir(path.dirname(filepath), { recursive: true });
+  await fs.writeFile(filepath, Buffer.from(docxBuffer as ArrayBuffer));
+
+  return relativePath;
 }

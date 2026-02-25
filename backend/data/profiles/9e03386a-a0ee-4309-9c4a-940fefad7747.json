@@ -1,0 +1,74 @@
+{
+  "name": "Li Cheng",
+  "title": "Senior FullStack Engineer",
+  "totalYearsExperience": 7,
+  "preferredTemplate": "two-column-slate",
+  "disabled": true,
+  "contact": {
+    "phone": "(813) 492-5329",
+    "email": "li.cheng.co919@gmail.com",
+    "linkedin": "https://www.linkedin.com/in/li-c-5a7436227/",
+    "github": "",
+    "portfolio": "",
+    "location": "Tampa, FL"
+  },
+  "summary": "",
+  "experience": [
+    {
+      "title": "Software Engineer",
+      "company": "Google",
+      "startDate": "03/2022",
+      "endDate": "Present",
+      "location": "New York, NY",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Software Engineer",
+      "company": "RBC",
+      "startDate": "01/2021",
+      "endDate": "02/2022",
+      "location": "Toronto, Ontario",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Full Stack Developer",
+      "company": "Acorns",
+      "startDate": "05/2019",
+      "endDate": "01/2021",
+      "location": "Irvine, California",
+      "description": "",
+      "achievements": []
+    }
+  ],
+  "strengths": [
+    {
+      "title": "API Optimization",
+      "description": "Led projects to optimize and reduce API response times, improving system performance and user experience."
+    },
+    {
+      "title": "Security Implementation",
+      "description": "Implemented security features and authentication systems, reducing data breaches and ensuring regulatory compliance."
+    },
+    {
+      "title": "Deployment Automation",
+      "description": "Automated deployment processes using Docker and Kubernetes, accelerating release cycles and reducing incidents."
+    }
+  ],
+  "skills": [],
+  "education": [
+    {
+      "degree": "Bachelor of Applied Science - BASc, Computer Science",
+      "institution": "University of Pennsylvania",
+      "startDate": "01/2015",
+      "endDate": "03/2019",
+      "location": "",
+      "gpa": ""
+    }
+  ],
+  "certifications": [],
+  "id": "9e03386a-a0ee-4309-9c4a-940fefad7747",
+  "createdAt": "2026-02-22T15:33:48.524Z",
+  "updatedAt": "2026-02-25T13:23:55.149Z"
+}

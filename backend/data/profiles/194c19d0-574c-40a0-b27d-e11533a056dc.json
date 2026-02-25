@@ -1,0 +1,87 @@
+{
+  "name": "Yuma Tsuboi",
+  "title": "Senior Software Engineer",
+  "totalYearsExperience": 8,
+  "preferredTemplate": "two-column-teal",
+  "disabled": true,
+  "contact": {
+    "phone": "(408) 465-9244",
+    "email": "yumatsuboi26@gmail.com",
+    "linkedin": "https://www.linkedin.com/in/yumatsuboi/",
+    "github": "",
+    "portfolio": "",
+    "location": "San Francisco, CA"
+  },
+  "summary": "",
+  "experience": [
+    {
+      "title": "Senior Software Engineer",
+      "company": "Discord",
+      "startDate": "06/2023",
+      "endDate": "02/2026",
+      "location": "San Francisco, CA",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Senior Software Engineer",
+      "company": "DoorDash",
+      "startDate": "01/2022",
+      "endDate": "03/2023",
+      "location": "San Francisco, CA",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Software Engineer",
+      "company": "DoorDash",
+      "startDate": "10/2018",
+      "endDate": "12/2021",
+      "location": "San Francisco, CA",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Backend Engineer",
+      "company": "SapientRazorfish",
+      "startDate": "03/2017",
+      "endDate": "08/2018",
+      "location": "San Francisco, CA",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "CAD Software Engineer Intern",
+      "company": "AMD",
+      "startDate": "05/2013",
+      "endDate": "05/2014",
+      "location": "Sunnyvale, CA",
+      "description": "",
+      "achievements": []
+    }
+  ],
+  "strengths": [],
+  "skills": [],
+  "education": [
+    {
+      "degree": "Master of Engineering, Social Robotics",
+      "institution": "University of Toronto",
+      "startDate": "09/2015",
+      "endDate": "06/2016",
+      "location": "Toronto, Canada",
+      "gpa": ""
+    },
+    {
+      "degree": "Bachelor of Applied Science, Electrical and Computer Engineering",
+      "institution": "University of Toronto",
+      "startDate": "09/2010",
+      "endDate": "06/2015",
+      "location": "Toronto, Canada",
+      "gpa": ""
+    }
+  ],
+  "certifications": [],
+  "id": "194c19d0-574c-40a0-b27d-e11533a056dc",
+  "createdAt": "2026-02-22T20:00:37.348Z",
+  "updatedAt": "2026-02-25T13:23:56.868Z"
+}

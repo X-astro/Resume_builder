@@ -2,7 +2,7 @@
   "name": "Xinyu Zhou",
   "title": "Senior Software Engineer",
   "totalYearsExperience": 7,
-  "preferredTemplate": "m/one-clean",
+  "preferredTemplate": "m/one-column-clean",
   "disabled": false,
   "contact": {
     "phone": "(564) 225-2375",
@@ -74,5 +74,5 @@
   "certifications": [],
   "id": "c674bffc-6d12-4cad-a01d-108614cca384",
   "createdAt": "2026-02-23T14:00:53.472Z",
-  "updatedAt": "2026-02-23T23:40:35.151Z"
+  "updatedAt": "2026-02-24T13:32:42.026Z"
 }

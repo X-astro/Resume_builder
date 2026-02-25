@@ -4,9 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.saveCoverLetter = saveCoverLetter;
+exports.saveCoverLetterDOCX = saveCoverLetterDOCX;
 const puppeteer_1 = __importDefault(require("puppeteer"));
 const promises_1 = __importDefault(require("fs/promises"));
 const path_1 = __importDefault(require("path"));
+/// <reference path="../types/html-to-docx.d.ts" />
+const html_to_docx_1 = __importDefault(require("html-to-docx"));
 function esc(s) {
     return String(s ?? '')
         .replace(/&/g, '&amp;')
@@ -42,6 +45,26 @@ function buildCoverLetterHTML(content, profileName) {
 </html>`;
 }
 /**
+ * Build cover letter HTML for DOCX with explicit line breaks between sections.
+ * Structure: Dear Hiring Manager, (line break), {content}, (line break), Best regards, {profile name}
+ */
+function buildCoverLetterHTMLForDocx(content, profileName) {
+    const accentColor = '#2B5C8A';
+    const lineBreak = '<p style="margin: 0 0 12pt 0;"></p>';
+    return `<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body style="font-family: Arial, sans-serif; font-size: 11pt; color: #1A1A1A; line-height: 1.5;">
+  <p style="margin: 0 0 12pt 0;">Dear Hiring Manager,</p>
+  ${lineBreak}
+  ${contentToHtmlParagraphs(content)}
+  ${lineBreak}
+  <p style="margin: 0 0 12pt 0;">Best regards,</p>
+  <p style="margin: 0; font-weight: bold; color: ${accentColor}; font-size: 12pt;">${esc(profileName.trim())}</p>
+</body>
+</html>`;
+}
+/**
  * Save cover letter as PDF in the same directory as the resume.
  * Path: {profile}/{count+1}_{company}/{role}/{profile}_cover_letter.pdf
  */
@@ -71,5 +94,24 @@ async function saveCoverLetter(profile, content, pathInfo) {
     finally {
         await browser.close();
     }
+}
+/**
+ * Save cover letter as DOCX in the same directory as the resume.
+ * Path: {profile}/{date}/{company}/{role}/{profile}_cover_letter.docx
+ */
+async function saveCoverLetterDOCX(profile, content, pathInfo) {
+    const filename = `${pathInfo.profileSlug}_cover_letter.docx`;
+    const relativePath = `${pathInfo.relativeBase}/${filename}`;
+    const filepath = path_1.default.join(pathInfo.absoluteDir, filename);
+    const html = buildCoverLetterHTMLForDocx(content.trim(), profile.name);
+    const docxBuffer = await (0, html_to_docx_1.default)(html, null, {
+        font: 'Arial',
+        fontSize: 22, // 11pt = 22 half-points
+        margins: { top: 1080, right: 1080, bottom: 1080, left: 1080 }, // 0.75in in twips
+        orientation: 'portrait',
+    });
+    await promises_1.default.mkdir(path_1.default.dirname(filepath), { recursive: true });
+    await promises_1.default.writeFile(filepath, Buffer.from(docxBuffer));
+    return relativePath;
 }
 //# sourceMappingURL=coverLetterGenerator.js.map

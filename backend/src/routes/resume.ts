@@ -4,7 +4,7 @@ import path from 'path';
 import { analyzeJobDescription, tailorResume, generateCoverLetter, resolveAIProvider } from '../services/claude';
 import { generateResumePDF, generatePreviewHTML, getGeneratedPDFPath } from '../services/pdfGenerator';
 import { generateResumeDOCX } from '../services/docxGenerator';
-import { saveCoverLetter } from '../services/coverLetterGenerator';
+import { saveCoverLetter, saveCoverLetterDOCX } from '../services/coverLetterGenerator';
 import { getGeneratedOutputPath } from '../services/generatedPath';
 import { getTemplateById, createDefaultTemplate } from '../services/templateExtractor';
 import { getAIModelSettings, getDefaultEnabledProvider, isProviderEnabled } from '../services/aiModelConfig';
@@ -108,7 +108,7 @@ router.post('/generate-all', async (req: Request, res: Response) => {
       analysis = jobAnalysis || await analyzeJobDescription(jobDescription, selectedModel);
     }
 
-    const results: { profileId: string; profileName: string; pdf?: string; docx?: string; coverLetter?: string }[] = [];
+    const results: { profileId: string; profileName: string; pdf?: string; docx?: string; coverLetterPdf?: string; coverLetterDocx?: string }[] = [];
     const formatNorm = (format as string) === 'both' ? 'both' : format === 'docx' ? 'docx' : 'pdf';
 
     for (const profile of profiles) {
@@ -131,9 +131,17 @@ router.post('/generate-all', async (req: Request, res: Response) => {
         coverLetterBody = await generateCoverLetter(profile, companyName.trim(), role.trim(), selectedModel);
       }
       const pathInfo = await getGeneratedOutputPath(profile, companyName.trim(), role.trim());
-      const coverLetterPath = await saveCoverLetter(profile, coverLetterBody, pathInfo);
+      const [coverLetterPdfPath, coverLetterDocxPath] = await Promise.all([
+        saveCoverLetter(profile, coverLetterBody, pathInfo),
+        saveCoverLetterDOCX(profile, coverLetterBody, pathInfo),
+      ]);
 
-      const entry: (typeof results)[0] = { profileId: profile.id, profileName: profile.name, coverLetter: coverLetterPath };
+      const entry: (typeof results)[0] = {
+        profileId: profile.id,
+        profileName: profile.name,
+        coverLetterPdf: coverLetterPdfPath,
+        coverLetterDocx: coverLetterDocxPath,
+      };
       if (formatNorm === 'both') {
         const [pdfFilename, docxFilename] = await Promise.all([
           generateResumePDF(profile, template, tailoredContent, pathInfo, companyName.trim(), role.trim()),
@@ -252,7 +260,10 @@ router.post('/generate', async (req: Request, res: Response) => {
       companyName.trim(),
       role.trim()
     );
-    const coverLetterPath = await saveCoverLetter(profile, coverLetterBody, pathInfo);
+    const [coverLetterPdfPath, coverLetterDocxPath] = await Promise.all([
+      saveCoverLetter(profile, coverLetterBody, pathInfo),
+      saveCoverLetterDOCX(profile, coverLetterBody, pathInfo),
+    ]);
 
     if (generateBoth) {
       const [pdfFilename, docxFilename] = await Promise.all([
@@ -262,7 +273,10 @@ router.post('/generate', async (req: Request, res: Response) => {
       res.json({
         pdf: { filename: pdfFilename, downloadUrl: `/api/generated/${pdfFilename}` },
         docx: { filename: docxFilename, downloadUrl: `/api/generated/${docxFilename}` },
-        coverLetter: { filename: coverLetterPath, downloadUrl: `/api/generated/${coverLetterPath}` },
+        coverLetter: {
+          pdf: { filename: coverLetterPdfPath, downloadUrl: `/api/generated/${coverLetterPdfPath}` },
+          docx: { filename: coverLetterDocxPath, downloadUrl: `/api/generated/${coverLetterDocxPath}` },
+        },
         tailored: !!tailoredContent,
       });
     } else {
@@ -275,7 +289,10 @@ router.post('/generate', async (req: Request, res: Response) => {
       res.json({
         filename,
         downloadUrl: `/api/generated/${filename}`,
-        coverLetter: { filename: coverLetterPath, downloadUrl: `/api/generated/${coverLetterPath}` },
+        coverLetter: {
+          pdf: { filename: coverLetterPdfPath, downloadUrl: `/api/generated/${coverLetterPdfPath}` },
+          docx: { filename: coverLetterDocxPath, downloadUrl: `/api/generated/${coverLetterDocxPath}` },
+        },
         tailored: !!tailoredContent,
         format: formatNorm
       });

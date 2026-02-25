@@ -2,7 +2,7 @@
   "name": "Xiaofan Jin",
   "title": "Senior Software Engineer",
   "totalYearsExperience": 8,
-  "preferredTemplate": "m/one-modern",
+  "preferredTemplate": "m/one-column-modern",
   "disabled": false,
   "contact": {
     "phone": "‪(425) 202-6019‬",
@@ -65,5 +65,5 @@
   "certifications": [],
   "id": "4913ac2b-0ca9-4625-b5dd-9efdb60d6e1b",
   "createdAt": "2026-02-23T14:26:58.752Z",
-  "updatedAt": "2026-02-23T17:09:41.471Z"
+  "updatedAt": "2026-02-24T13:32:49.441Z"
 }

@@ -1,0 +1,91 @@
+{
+  "name": "John Vento",
+  "title": "Senior Software Engineer",
+  "totalYearsExperience": 10,
+  "preferredTemplate": "default",
+  "disabled": true,
+  "contact": {
+    "phone": "(415) 748-5944",
+    "email": "johnvento504@gmail.com",
+    "linkedin": "https://linkedin.com/in/john-vento-03965252",
+    "github": "",
+    "portfolio": "",
+    "location": "San Jose, CA"
+  },
+  "summary": "",
+  "experience": [
+    {
+      "title": "Software Engineer",
+      "company": "MasterControl",
+      "startDate": "01/2023",
+      "endDate": "Present",
+      "location": "Salt Lake City, UT",
+      "description": "Built backend services for a regulated SaaS platform serving 1,100 pharmaceutical and biotech companies.",
+      "achievements": []
+    },
+    {
+      "title": "Software Engineer",
+      "company": "Workday",
+      "startDate": "08/2018",
+      "endDate": "09/2022",
+      "location": "Pleasanton, CA",
+      "description": "Built backend services for an enterprise HCM SaaS platform processing 365 billion transactions annually across 55 million users in a cloud-native, distributed microservices architecture.",
+      "achievements": []
+    },
+    {
+      "title": "Software Engineer",
+      "company": "Informatica",
+      "startDate": "08/2014",
+      "endDate": "06/2018",
+      "location": "Redwood City, CA",
+      "description": "Developed backend Python services and APIs for the IICS iPaaS platform, a Gartner Magic Quadrant Leader.",
+      "achievements": []
+    },
+    {
+      "title": "Software Development Intern",
+      "company": "Informatica",
+      "startDate": "06/2013",
+      "endDate": "09/2013",
+      "location": "Redwood City, CA",
+      "description": "Contributed to the Informatica Cloud Platform using Python, Java, and RESTful service patterns.",
+      "achievements": []
+    }
+  ],
+  "strengths": [
+    {
+      "title": "Distributed Systems Expertise",
+      "description": "Extensive experience designing and building scalable, resilient microservices and APIs for high-throughput SaaS and enterprise platforms."
+    },
+    {
+      "title": "Complex Data Modeling",
+      "description": "Deep knowledge of relational and graph data modeling, including PostgreSQL schema design, query optimization, and knowledge-graph-style data access patterns."
+    },
+    {
+      "title": "Engineering Ownership & Leadership",
+      "description": "Demonstrates strong ownership, mentorship, and collaboration skills, driving architectural decisions and fostering an engineering-as-craft culture."
+    }
+  ],
+  "skills": [],
+  "education": [
+    {
+      "degree": "B.S. Computer Science",
+      "institution": "University of California San Diego",
+      "startDate": "2011",
+      "endDate": "2014",
+      "location": "",
+      "gpa": ""
+    },
+    {
+      "degree": "Civil Engineering",
+      "institution": "San Diego State University",
+      "startDate": "2009",
+      "endDate": "2011",
+      "location": "",
+      "gpa": ""
+    }
+  ],
+  "certifications": [],
+  "id": "f38556d3-61bf-491a-b254-1952ee9df701",
+  "createdAt": "2026-02-22T23:51:06.925Z",
+  "updatedAt": "2026-02-25T13:23:58.669Z"
+}

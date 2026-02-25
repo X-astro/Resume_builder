@@ -99,26 +99,7 @@ async function getTemplateById(id) {
     try {
         const content = await promises_1.default.readFile(templatePath, 'utf-8');
         const parsed = JSON.parse(content);
-        let cssContent = parsed.cssContent || '';
-        // For templates in subfolders (e.g. m/one-clean), load external CSS if cssContent is empty
-        if (!cssContent.trim() && normalizedId.includes('/')) {
-            const cssPath = path_1.default.join(TEMPLATES_DIR, `${normalizedId}.css`);
-            try {
-                cssContent = await promises_1.default.readFile(cssPath, 'utf-8');
-            }
-            catch {
-                // Also try style.css in same directory
-                const dir = path_1.default.dirname(templatePath);
-                const stylePath = path_1.default.join(dir, 'style.css');
-                try {
-                    cssContent = await promises_1.default.readFile(stylePath, 'utf-8');
-                }
-                catch {
-                    // No external CSS found
-                }
-            }
-        }
-        return { ...parsed, id: normalizedId, cssContent: cssContent || parsed.cssContent || '' };
+        return { ...parsed, id: normalizedId };
     }
     catch {
         return null;

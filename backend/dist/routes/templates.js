@@ -7,7 +7,6 @@ const express_1 = require("express");
 const multer_1 = __importDefault(require("multer"));
 const auth_1 = require("../middleware/auth");
 const templateExtractor_1 = require("../services/templateExtractor");
-const pdfGenerator_1 = require("../services/pdfGenerator");
 const router = (0, express_1.Router)();
 // Configure multer for PDF uploads
 const upload = (0, multer_1.default)({
@@ -41,55 +40,10 @@ router.get('/', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch templates' });
     }
 });
-// Preview template with placeholder data (for admin display)
-const PLACEHOLDER_PROFILE = {
-    id: 'preview',
-    name: 'Your Name',
-    title: 'Professional Title',
-    totalYearsExperience: 5,
-    contact: { phone: '(555) 123-4567', email: 'you@example.com', location: 'City, State' },
-    summary: 'Professional summary placeholder for template preview.',
-    experience: [
-        {
-            title: 'Senior Role',
-            company: 'Company Name',
-            startDate: '01/2020',
-            endDate: 'Present',
-            location: 'City, State',
-            description: 'Role description',
-            achievements: ['Key achievement 1', 'Key achievement 2'],
-        },
-    ],
-    strengths: [{ title: 'Strength', description: 'Description of strength.' }],
-    skills: ['Skill 1', 'Skill 2', 'Skill 3'],
-    education: [
-        { degree: 'Bachelor of Science', institution: 'University Name', startDate: '2015', endDate: '2019', location: 'City' },
-    ],
-    createdAt: '',
-    updatedAt: '',
-};
-router.get('/preview/:id', async (req, res) => {
-    try {
-        const id = decodeURIComponent(req.params.id);
-        const template = await (0, templateExtractor_1.getTemplateById)(id);
-        if (!template) {
-            res.status(404).json({ error: 'Template not found' });
-            return;
-        }
-        const html = await (0, pdfGenerator_1.generatePreviewHTML)(PLACEHOLDER_PROFILE, template);
-        res.setHeader('Content-Type', 'text/html');
-        res.send(html);
-    }
-    catch (error) {
-        console.error('Error generating template preview:', error);
-        res.status(500).json({ error: 'Failed to generate preview' });
-    }
-});
-// Get single template (id may contain slashes, e.g. m/one-clean)
+// Get single template
 router.get('/:id', async (req, res) => {
     try {
-        const id = decodeURIComponent(req.params.id);
-        const template = await (0, templateExtractor_1.getTemplateById)(id);
+        const template = await (0, templateExtractor_1.getTemplateById)(req.params.id);
         if (!template) {
             res.status(404).json({ error: 'Template not found' });
             return;
@@ -121,9 +75,8 @@ router.post('/upload', auth_1.authMiddleware, upload.single('pdf'), async (req, 
 // Update template (protected) - e.g. toggle disabled
 router.patch('/:id', auth_1.authMiddleware, async (req, res) => {
     try {
-        const id = decodeURIComponent(req.params.id);
         const { disabled } = req.body;
-        const updated = await (0, templateExtractor_1.updateTemplate)(id, { disabled });
+        const updated = await (0, templateExtractor_1.updateTemplate)(req.params.id, { disabled });
         if (!updated) {
             res.status(404).json({ error: 'Template not found' });
             return;
@@ -138,18 +91,17 @@ router.patch('/:id', auth_1.authMiddleware, async (req, res) => {
 // Delete template (protected)
 router.delete('/:id', auth_1.authMiddleware, async (req, res) => {
     try {
-        const id = decodeURIComponent(req.params.id);
         const builtInTemplates = [
             'default', 'one-column', 'one-column-modern',
             'two-column-navy', 'one-column-emerald', 'one-column-violet', 'one-column-rose',
             'two-column-slate', 'one-column-amber', 'one-column-indigo', 'two-column-minimal',
             'one-column-serif', 'two-column-teal', 'one-column-coral', 'two-column-forest'
         ];
-        if (builtInTemplates.includes(id)) {
+        if (builtInTemplates.includes(req.params.id)) {
             res.status(400).json({ error: 'Cannot delete built-in templates' });
             return;
         }
-        const deleted = await (0, templateExtractor_1.deleteTemplate)(id);
+        const deleted = await (0, templateExtractor_1.deleteTemplate)(req.params.id);
         if (!deleted) {
             res.status(404).json({ error: 'Template not found' });
             return;

@@ -118,8 +118,16 @@ router.post('/generate-all', async (req, res) => {
                 coverLetterBody = await (0, claude_1.generateCoverLetter)(profile, companyName.trim(), role.trim(), selectedModel);
             }
             const pathInfo = await (0, generatedPath_1.getGeneratedOutputPath)(profile, companyName.trim(), role.trim());
-            const coverLetterPath = await (0, coverLetterGenerator_1.saveCoverLetter)(profile, coverLetterBody, pathInfo);
-            const entry = { profileId: profile.id, profileName: profile.name, coverLetter: coverLetterPath };
+            const [coverLetterPdfPath, coverLetterDocxPath] = await Promise.all([
+                (0, coverLetterGenerator_1.saveCoverLetter)(profile, coverLetterBody, pathInfo),
+                (0, coverLetterGenerator_1.saveCoverLetterDOCX)(profile, coverLetterBody, pathInfo),
+            ]);
+            const entry = {
+                profileId: profile.id,
+                profileName: profile.name,
+                coverLetterPdf: coverLetterPdfPath,
+                coverLetterDocx: coverLetterDocxPath,
+            };
             if (formatNorm === 'both') {
                 const [pdfFilename, docxFilename] = await Promise.all([
                     (0, pdfGenerator_1.generateResumePDF)(profile, template, tailoredContent, pathInfo, companyName.trim(), role.trim()),
@@ -213,7 +221,10 @@ router.post('/generate', async (req, res) => {
             coverLetterBody = await (0, claude_1.generateCoverLetter)(profile, companyName.trim(), role.trim(), selectedModel);
         }
         const pathInfo = await (0, generatedPath_1.getGeneratedOutputPath)(profile, companyName.trim(), role.trim());
-        const coverLetterPath = await (0, coverLetterGenerator_1.saveCoverLetter)(profile, coverLetterBody, pathInfo);
+        const [coverLetterPdfPath, coverLetterDocxPath] = await Promise.all([
+            (0, coverLetterGenerator_1.saveCoverLetter)(profile, coverLetterBody, pathInfo),
+            (0, coverLetterGenerator_1.saveCoverLetterDOCX)(profile, coverLetterBody, pathInfo),
+        ]);
         if (generateBoth) {
             const [pdfFilename, docxFilename] = await Promise.all([
                 (0, pdfGenerator_1.generateResumePDF)(profile, template, tailoredContent, pathInfo, companyName.trim(), role.trim()),
@@ -222,7 +233,10 @@ router.post('/generate', async (req, res) => {
             res.json({
                 pdf: { filename: pdfFilename, downloadUrl: `/api/generated/${pdfFilename}` },
                 docx: { filename: docxFilename, downloadUrl: `/api/generated/${docxFilename}` },
-                coverLetter: { filename: coverLetterPath, downloadUrl: `/api/generated/${coverLetterPath}` },
+                coverLetter: {
+                    pdf: { filename: coverLetterPdfPath, downloadUrl: `/api/generated/${coverLetterPdfPath}` },
+                    docx: { filename: coverLetterDocxPath, downloadUrl: `/api/generated/${coverLetterDocxPath}` },
+                },
                 tailored: !!tailoredContent,
             });
         }
@@ -234,7 +248,10 @@ router.post('/generate', async (req, res) => {
             res.json({
                 filename,
                 downloadUrl: `/api/generated/${filename}`,
-                coverLetter: { filename: coverLetterPath, downloadUrl: `/api/generated/${coverLetterPath}` },
+                coverLetter: {
+                    pdf: { filename: coverLetterPdfPath, downloadUrl: `/api/generated/${coverLetterPdfPath}` },
+                    docx: { filename: coverLetterDocxPath, downloadUrl: `/api/generated/${coverLetterDocxPath}` },
+                },
                 tailored: !!tailoredContent,
                 format: formatNorm
             });

@@ -1,0 +1,118 @@
+{
+  "name": "Zesheng Cai",
+  "title": "Senior Software Engineer",
+  "totalYearsExperience": 13,
+  "preferredTemplate": "default",
+  "disabled": true,
+  "contact": {
+    "phone": "(650) 516-7947",
+    "email": "zesheng.cai.tech@gmail.com",
+    "linkedin": "https://www.linkedin.com/in/zesheng-cai-1940473b/",
+    "github": "",
+    "portfolio": "",
+    "location": "Santa Clara, CA"
+  },
+  "summary": "",
+  "experience": [
+    {
+      "title": "Senior Software Engineer",
+      "company": "Zoox",
+      "startDate": "08/2023",
+      "endDate": "Present",
+      "location": "Foster City, CA",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Senior Software Engineer",
+      "company": "Wayfair",
+      "startDate": "09/2021",
+      "endDate": "01/2023",
+      "location": "San Francisco Bay Area",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Software Development Engineer",
+      "company": "Amazon Web Services (AWS)",
+      "startDate": "10/2019",
+      "endDate": "10/2021",
+      "location": "Greater New York City Area",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Senior Software Engineer",
+      "company": "Capital One",
+      "startDate": "08/2018",
+      "endDate": "10/2019",
+      "location": "McLean, VA",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Software Engineer",
+      "company": "Capital One",
+      "startDate": "03/2017",
+      "endDate": "08/2018",
+      "location": "Washington D.C. Metro Area",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "GIS Developer",
+      "company": "Timmons Group",
+      "startDate": "03/2014",
+      "endDate": "03/2017",
+      "location": "Richmond, VA",
+      "description": "Developing and Supporting GIS application",
+      "achievements": []
+    },
+    {
+      "title": "GIS Developer",
+      "company": "ZillionInfo",
+      "startDate": "05/2013",
+      "endDate": "12/2013",
+      "location": "Columbia, SC",
+      "description": "",
+      "achievements": []
+    }
+  ],
+  "strengths": [
+    {
+      "title": "System Performance Optimization",
+      "description": "Improved system performance by 30% through optimized code for efficiency."
+    },
+    {
+      "title": "Project Delivery Leadership",
+      "description": "Led a team of 5, delivering a major software release two weeks ahead."
+    },
+    {
+      "title": "Efficient Coding Techniques",
+      "description": "Reduced program runtime by 40% utilizing advanced algorithms and data structures."
+    }
+  ],
+  "skills": [],
+  "education": [
+    {
+      "degree": "Master of Science (MS)",
+      "institution": "University at Buffalo",
+      "startDate": "2011",
+      "endDate": "2013",
+      "location": "Buffalo, NY",
+      "gpa": ""
+    },
+    {
+      "degree": "Bachelor's Degree",
+      "institution": "University at Buffalo",
+      "startDate": "2007",
+      "endDate": "2011",
+      "location": "Buffalo, NY",
+      "gpa": ""
+    }
+  ],
+  "certifications": [],
+  "id": "90f8bfdc-845a-433d-8ea1-d73824a0d5d5",
+  "createdAt": "2026-02-23T13:13:44.103Z",
+  "updatedAt": "2026-02-25T13:24:04.765Z"
+}
