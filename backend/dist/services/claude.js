@@ -13,7 +13,7 @@ exports.extractProfileFromResume = extractProfileFromResume;
 const openai_1 = __importDefault(require("openai"));
 // Lazy initialization to ensure env vars are loaded first
 let openaiClient = null;
-const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4.1';
+const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-5.1';
 const CLAUDE_MODEL = 'claude-sonnet-4-20250514';
 const DEFAULT_PROVIDER = 'openai';
 exports.DEFAULT_PROVIDER = DEFAULT_PROVIDER;
@@ -300,7 +300,7 @@ async function createTextCompletion(prompt, provider = DEFAULT_PROVIDER, maxToke
     if (provider === 'openai') {
         const response = await getOpenAIClient().chat.completions.create({
             model: OPENAI_MODEL,
-            max_tokens: maxTokens,
+            max_completion_tokens: maxTokens,
             temperature,
             top_p: 1,
             response_format: { type: 'json_object' },
