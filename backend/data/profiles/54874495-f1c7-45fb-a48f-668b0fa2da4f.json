@@ -1,0 +1,87 @@
+{
+  "name": "Tai-Lin Chu",
+  "title": "Senior Software Engineer",
+  "totalYearsExperience": 8,
+  "preferredTemplate": "default",
+  "disabled": true,
+  "contact": {
+    "phone": "(415) 340-1296",
+    "email": "tailinchu04@gmail.com",
+    "linkedin": "https://www.linkedin.com/in/tai-lin-chu-6695b255",
+    "github": "",
+    "portfolio": "",
+    "location": "San Francisco, CA"
+  },
+  "summary": "",
+  "experience": [
+    {
+      "title": "Staff Software Engineer",
+      "company": "Fathom",
+      "startDate": "12/2020",
+      "endDate": "02/2026",
+      "location": "San Francisco Bay Area",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Senior Software Engineer",
+      "company": "UserVoice",
+      "startDate": "08/2015",
+      "endDate": "12/2020",
+      "location": "San Francisco, CA",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Software Developer",
+      "company": "smartestk12",
+      "startDate": "01/2014",
+      "endDate": "07/2014",
+      "location": "Los Angeles, CA",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Research Assistant Intern",
+      "company": "INTEL-NTU",
+      "startDate": "07/2013",
+      "endDate": "08/2013",
+      "location": "Los Angeles, CA",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Intern",
+      "company": "KokoChe",
+      "startDate": "05/2012",
+      "endDate": "12/2012",
+      "location": "Los Angeles, CA",
+      "description": "",
+      "achievements": []
+    }
+  ],
+  "strengths": [],
+  "skills": [],
+  "education": [
+    {
+      "degree": "Master's in Computer Science",
+      "institution": "UCLA",
+      "startDate": "09/2014",
+      "endDate": "06/2016",
+      "location": "Los Angeles, CA",
+      "gpa": ""
+    },
+    {
+      "degree": "Bachelor's in Computer Science",
+      "institution": "UCLA",
+      "startDate": "09/2010",
+      "endDate": "06/2014",
+      "location": "Los Angeles, CA",
+      "gpa": ""
+    }
+  ],
+  "certifications": [],
+  "id": "54874495-f1c7-45fb-a48f-668b0fa2da4f",
+  "createdAt": "2026-02-22T19:54:08.929Z",
+  "updatedAt": "2026-02-25T13:23:53.917Z"
+}

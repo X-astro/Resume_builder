@@ -323,7 +323,15 @@ export const resumeApi = {
   }) =>
     apiFetch<
       | { filename: string; downloadUrl: string; tailored: boolean; format?: 'pdf' | 'docx' }
-      | { pdf: { filename: string; downloadUrl: string }; docx: { filename: string; downloadUrl: string }; coverLetter?: { filename: string; downloadUrl: string }; tailored: boolean }
+      | {
+          pdf: { filename: string; downloadUrl: string };
+          docx: { filename: string; downloadUrl: string };
+          coverLetter?: {
+            pdf: { filename: string; downloadUrl: string };
+            docx: { filename: string; downloadUrl: string };
+          };
+          tailored: boolean;
+        }
     >(
       '/resume/generate',
       {
@@ -343,7 +351,14 @@ export const resumeApi = {
   }) =>
     apiFetch<{
       generated: number;
-      results: Array<{ profileId: string; profileName: string; pdf?: string; docx?: string; coverLetter?: string }>;
+      results: Array<{
+        profileId: string;
+        profileName: string;
+        pdf?: string;
+        docx?: string;
+        coverLetterPdf?: string;
+        coverLetterDocx?: string;
+      }>;
       tailored: boolean;
     }>('/resume/generate-all', {
       method: 'POST',

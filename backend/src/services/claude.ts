@@ -5,7 +5,7 @@ import { AIProvider, JobAnalysis, TailoredContent } from '../types/template';
 // Lazy initialization to ensure env vars are loaded first
 let openaiClient: OpenAI | null = null;
 
-const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4.1';
+const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-5.1';
 const CLAUDE_MODEL = 'claude-sonnet-4-20250514';
 const DEFAULT_PROVIDER: AIProvider = 'openai';
 const ANTHROPIC_MAX_RETRIES = 4;
@@ -321,7 +321,7 @@ async function createTextCompletion(prompt: string, provider: AIProvider = DEFAU
   if (provider === 'openai') {
     const response = await getOpenAIClient().chat.completions.create({
       model: OPENAI_MODEL,
-      max_tokens: maxTokens,
+      max_completion_tokens: maxTokens,
       temperature,
       top_p: 1,
       response_format: { type: 'json_object' },

@@ -1,0 +1,70 @@
+{
+  "name": "Zheng Sun",
+  "title": "Senior Software Engineer",
+  "totalYearsExperience": 12,
+  "preferredTemplate": "m/two-column-navy",
+  "disabled": false,
+  "contact": {
+    "phone": "‪(408) 461-5468‬",
+    "email": "sunzhendavid@gmail.com",
+    "linkedin": "https://www.linkedin.com/in/sunzhengdavid/",
+    "github": "",
+    "portfolio": "",
+    "location": "Sunnyvale, CA"
+  },
+  "summary": "",
+  "experience": [
+    {
+      "title": "Software Engineer",
+      "company": "Meta",
+      "startDate": "03/2022",
+      "endDate": "Present",
+      "location": "Sunnyvale, CA",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Senior Staff Software Engineer",
+      "company": "Earnin",
+      "startDate": "11/2020",
+      "endDate": "01/2022",
+      "location": "Sunnyvale, CA",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Staff Software Engineer",
+      "company": "Google",
+      "startDate": "10/2019",
+      "endDate": "10/2020",
+      "location": "Sunnyvale, CA",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Software Engineer",
+      "company": "Google",
+      "startDate": "10/2013",
+      "endDate": "10/2019",
+      "location": "Sunnyvale, CA",
+      "description": "",
+      "achievements": []
+    }
+  ],
+  "strengths": [],
+  "skills": [],
+  "education": [
+    {
+      "degree": "Bachelor's degree in Computer Science",
+      "institution": "Fudan University",
+      "startDate": "2009",
+      "endDate": "2013",
+      "location": "",
+      "gpa": ""
+    }
+  ],
+  "certifications": [],
+  "id": "93e346a3-e69e-45bf-a6a9-4142f2d66170",
+  "createdAt": "2026-02-24T12:59:41.031Z",
+  "updatedAt": "2026-02-24T13:25:03.426Z"
+}
