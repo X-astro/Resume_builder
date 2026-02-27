@@ -7,8 +7,12 @@ import {
   getTemplateById,
   updateTemplate,
   deleteTemplate,
-  createDefaultTemplate
+  createDefaultTemplate,
+  createManualTemplate,
+  updateManualTemplate,
+  type ManualTemplateConfig,
 } from '../services/templateExtractor';
+import { generateTemplatePreviewHTML } from '../services/pdfGenerator';
 
 const router = Router();
 
@@ -45,6 +49,22 @@ router.get('/', async (req: Request, res: Response) => {
   }
 });
 
+// Get template preview HTML (sample data)
+router.get('/:id/preview', async (req: Request<{ id: string }>, res: Response) => {
+  try {
+    const template = await getTemplateById(req.params.id);
+    if (!template) {
+      res.status(404).json({ error: 'Template not found' });
+      return;
+    }
+    const html = generateTemplatePreviewHTML(template);
+    res.type('html').send(html);
+  } catch (error) {
+    console.error('Error generating template preview:', error);
+    res.status(500).json({ error: 'Failed to generate preview' });
+  }
+});
+
 // Get single template
 router.get('/:id', async (req: Request<{ id: string }>, res: Response) => {
   try {
@@ -56,6 +76,42 @@ router.get('/:id', async (req: Request<{ id: string }>, res: Response) => {
     res.json(template);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch template' });
+  }
+});
+
+// Create manual template (protected)
+router.post('/create-manual', authMiddleware, async (req: Request, res: Response) => {
+  try {
+    const config = req.body as ManualTemplateConfig & { name: string };
+    if (!config?.name?.trim()) {
+      res.status(400).json({ error: 'Template name is required' });
+      return;
+    }
+    const template = await createManualTemplate({
+      name: config.name,
+      description: config.description,
+      columns: config.columns === 2 ? 2 : 1,
+      accentColor: config.accentColor || '#1e40af',
+      bodyColor: config.bodyColor || '#000',
+      bodyFontSizePt: config.bodyFontSizePt ?? 9,
+      titleFontSizePt: config.titleFontSizePt ?? 24,
+      sectionOrder: Array.isArray(config.sectionOrder) ? config.sectionOrder : [],
+      leftSectionOrder: Array.isArray(config.leftSectionOrder) ? config.leftSectionOrder : [],
+      rightSectionOrder: Array.isArray(config.rightSectionOrder) ? config.rightSectionOrder : [],
+      nameStyle: config.nameStyle,
+      headerTitleStyle: config.headerTitleStyle,
+      contactStyle: config.contactStyle,
+      titleStyle: config.titleStyle,
+      subTitleStyle: config.subTitleStyle,
+      paragraphStyle: config.paragraphStyle,
+      sectionStyles: config.sectionStyles,
+    });
+    res.status(201).json(template);
+  } catch (error) {
+    console.error('Error creating manual template:', error);
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Failed to create template',
+    });
   }
 });
 
@@ -84,11 +140,55 @@ router.post('/upload', authMiddleware, upload.single('pdf'), async (req: Request
   }
 });
 
-// Update template (protected) - e.g. toggle disabled
+// Update manual template (protected)
+router.put('/:id/update-manual', authMiddleware, async (req: Request<{ id: string }>, res: Response) => {
+  try {
+    const config = req.body as ManualTemplateConfig & { name: string };
+    if (!config?.name?.trim()) {
+      res.status(400).json({ error: 'Template name is required' });
+      return;
+    }
+    const template = await updateManualTemplate(req.params.id, {
+      name: config.name,
+      description: config.description,
+      columns: config.columns === 2 ? 2 : 1,
+      accentColor: config.accentColor || '#1e40af',
+      bodyColor: config.bodyColor || '#000',
+      bodyFontSizePt: config.bodyFontSizePt ?? 9,
+      titleFontSizePt: config.titleFontSizePt ?? 24,
+      sectionOrder: Array.isArray(config.sectionOrder) ? config.sectionOrder : [],
+      leftSectionOrder: Array.isArray(config.leftSectionOrder) ? config.leftSectionOrder : [],
+      rightSectionOrder: Array.isArray(config.rightSectionOrder) ? config.rightSectionOrder : [],
+      nameStyle: config.nameStyle,
+      headerTitleStyle: config.headerTitleStyle,
+      contactStyle: config.contactStyle,
+      titleStyle: config.titleStyle,
+      subTitleStyle: config.subTitleStyle,
+      paragraphStyle: config.paragraphStyle,
+      sectionStyles: config.sectionStyles,
+    });
+    if (!template) {
+      res.status(404).json({ error: 'Template not found' });
+      return;
+    }
+    res.json(template);
+  } catch (error) {
+    console.error('Error updating manual template:', error);
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Failed to update template',
+    });
+  }
+});
+
+// Update template (protected) - e.g. toggle disabled, name, description
 router.patch('/:id', authMiddleware, async (req: Request<{ id: string }>, res: Response) => {
   try {
-    const { disabled } = req.body as { disabled?: boolean };
-    const updated = await updateTemplate(req.params.id, { disabled });
+    const { disabled, name, description } = req.body as { disabled?: boolean; name?: string; description?: string };
+    const updates: { disabled?: boolean; name?: string; description?: string } = {};
+    if (typeof disabled === 'boolean') updates.disabled = disabled;
+    if (typeof name === 'string') updates.name = name.trim();
+    if (typeof description === 'string') updates.description = description.trim();
+    const updated = await updateTemplate(req.params.id, updates);
     if (!updated) {
       res.status(404).json({ error: 'Template not found' });
       return;

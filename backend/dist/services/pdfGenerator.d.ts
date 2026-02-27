@@ -24,5 +24,6 @@ export declare function prepareResumeRenderData(profile: Profile, tailoredConten
 };
 export declare function generateResumePDF(profile: Profile, template: Template, tailoredContent: TailoredContent | undefined, pathInfo: GeneratedPathInfo, companyName?: string, role?: string): Promise<string>;
 export declare function generatePreviewHTML(profile: Profile, template: Template, tailoredContent?: TailoredContent): Promise<string>;
+export declare function generateTemplatePreviewHTML(template: Template): string;
 export declare function getGeneratedPDFPath(filename: string): Promise<string | null>;
 //# sourceMappingURL=pdfGenerator.d.ts.map

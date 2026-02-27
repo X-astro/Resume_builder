@@ -205,6 +205,23 @@ export interface CreateProfileDTO {
 }
 
 // Template types
+export interface ManualTemplateConfigStored {
+  name: string;
+  description?: string;
+  columns: 1 | 2;
+  accentColor?: string;
+  bodyColor?: string;
+  bodyFontSizePt?: number;
+  titleFontSizePt?: number;
+  sectionOrder?: string[];
+  leftSectionOrder?: string[];
+  rightSectionOrder?: string[];
+  nameStyle?: { color?: string; fontSizePt?: number; fontFamily?: string; fontWeight?: string };
+  headerTitleStyle?: { color?: string; fontSizePt?: number; fontFamily?: string; fontWeight?: string };
+  contactStyle?: { color?: string; fontSizePt?: number; fontFamily?: string; fontWeight?: string };
+  sectionStyles?: Record<string, Record<string, { color?: string; fontSizePt?: number; fontFamily?: string; fontWeight?: string }>>;
+}
+
 export interface Template {
   id: string;
   name: string;
@@ -215,6 +232,7 @@ export interface Template {
   sections: string[];
   createdAt: string;
   updatedAt: string;
+  manualConfig?: ManualTemplateConfigStored;
 }
 
 // Job Analysis types
@@ -278,7 +296,7 @@ export const templatesApi = {
 
   getById: (id: string) => apiFetch<Template>(`/templates/${id}`),
 
-  update: (id: string, data: { disabled?: boolean }) =>
+  update: (id: string, data: { disabled?: boolean; name?: string; description?: string }) =>
     apiFetch<Template>(`/templates/${id}`, {
       method: 'PATCH',
       body: JSON.stringify(data),
@@ -298,6 +316,54 @@ export const templatesApi = {
   delete: (id: string) =>
     apiFetch<{ message: string }>(`/templates/${id}`, {
       method: 'DELETE',
+    }),
+
+  updateManual: (id: string, config: {
+    name: string;
+    description?: string;
+    columns?: 1 | 2;
+    accentColor?: string;
+    bodyColor?: string;
+    bodyFontSizePt?: number;
+    titleFontSizePt?: number;
+    sectionOrder?: string[];
+    leftSectionOrder?: string[];
+    rightSectionOrder?: string[];
+    nameStyle?: { color?: string; fontSizePt?: number; fontFamily?: string; fontWeight?: 'normal' | 'bold' };
+    headerTitleStyle?: { color?: string; fontSizePt?: number; fontFamily?: string; fontWeight?: 'normal' | 'bold' };
+    contactStyle?: { color?: string; fontSizePt?: number; fontFamily?: string; fontWeight?: 'normal' | 'bold' };
+    titleStyle?: { color?: string; fontSizePt?: number; fontFamily?: string; fontWeight?: 'normal' | 'bold' };
+    subTitleStyle?: { color?: string; fontSizePt?: number; fontFamily?: string; fontWeight?: 'normal' | 'bold' };
+    paragraphStyle?: { color?: string; fontSizePt?: number; fontFamily?: string; fontWeight?: 'normal' | 'bold' };
+    sectionStyles?: Record<string, Record<string, { color?: string; fontSizePt?: number; fontFamily?: string; fontWeight?: string }>>;
+  }) =>
+    apiFetch<Template>(`/templates/${id}/update-manual`, {
+      method: 'PUT',
+      body: JSON.stringify(config),
+    }),
+
+  createManual: (config: {
+    name: string;
+    description?: string;
+    columns?: 1 | 2;
+    accentColor?: string;
+    bodyColor?: string;
+    bodyFontSizePt?: number;
+    titleFontSizePt?: number;
+    sectionOrder?: string[];
+    leftSectionOrder?: string[];
+    rightSectionOrder?: string[];
+    nameStyle?: { color?: string; fontSizePt?: number; fontFamily?: string; fontWeight?: 'normal' | 'bold' };
+    headerTitleStyle?: { color?: string; fontSizePt?: number; fontFamily?: string; fontWeight?: 'normal' | 'bold' };
+    contactStyle?: { color?: string; fontSizePt?: number; fontFamily?: string; fontWeight?: 'normal' | 'bold' };
+    titleStyle?: { color?: string; fontSizePt?: number; fontFamily?: string; fontWeight?: 'normal' | 'bold' };
+    subTitleStyle?: { color?: string; fontSizePt?: number; fontFamily?: string; fontWeight?: 'normal' | 'bold' };
+    paragraphStyle?: { color?: string; fontSizePt?: number; fontFamily?: string; fontWeight?: 'normal' | 'bold' };
+    sectionStyles?: Record<string, Record<string, { color?: string; fontSizePt?: number; fontFamily?: string; fontWeight?: string }>>;
+  }) =>
+    apiFetch<Template>('/templates/create-manual', {
+      method: 'POST',
+      body: JSON.stringify(config),
     }),
 };
 

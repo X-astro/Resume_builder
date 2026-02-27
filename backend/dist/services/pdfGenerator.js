@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.prepareResumeRenderData = prepareResumeRenderData;
 exports.generateResumePDF = generateResumePDF;
 exports.generatePreviewHTML = generatePreviewHTML;
+exports.generateTemplatePreviewHTML = generateTemplatePreviewHTML;
 exports.getGeneratedPDFPath = getGeneratedPDFPath;
 const puppeteer_1 = __importDefault(require("puppeteer"));
 const handlebars_1 = __importDefault(require("handlebars"));
@@ -474,6 +475,65 @@ async function generatePreviewHTML(profile, template, tailoredContent) {
     return template.cssContent
         ? `<style>${template.cssContent}</style>${html}`
         : html;
+}
+/** Sample profile for template preview */
+const SAMPLE_PROFILE = {
+    id: 'preview',
+    name: 'Jane Smith',
+    title: 'Senior Software Engineer',
+    totalYearsExperience: 5,
+    contact: {
+        phone: '+1 (555) 123-4567',
+        email: 'jane.smith@email.com',
+        linkedin: 'linkedin.com/in/janesmith',
+        location: 'San Francisco, CA',
+    },
+    summary: 'Experienced software engineer with 5+ years building scalable web applications. Strong focus on clean code and team collaboration.',
+    experience: [
+        {
+            title: 'Senior Software Engineer',
+            company: 'Tech Corp',
+            startDate: '01/2021',
+            endDate: 'Present',
+            location: 'San Francisco, CA',
+            description: 'Lead development of customer-facing platforms.',
+            achievements: ['Reduced load time by 40%', 'Mentored 3 junior engineers'],
+        },
+        {
+            title: 'Software Engineer',
+            company: 'Startup Inc',
+            startDate: '06/2019',
+            endDate: '12/2020',
+            location: 'Remote',
+            description: 'Full-stack development for SaaS product.',
+            achievements: ['Built REST APIs', 'Implemented CI/CD pipeline'],
+        },
+    ],
+    strengths: [
+        { title: 'Problem Solving', description: 'Analytical approach to complex challenges.' },
+        { title: 'Communication', description: 'Clear technical documentation and presentations.' },
+    ],
+    skills: ['JavaScript', 'TypeScript', 'React', 'Node.js', 'Python'],
+    education: [
+        {
+            degree: 'B.S. Computer Science',
+            institution: 'State University',
+            startDate: '2015',
+            endDate: '2019',
+            location: 'Boston, MA',
+        },
+    ],
+    createdAt: '',
+    updatedAt: '',
+};
+function generateTemplatePreviewHTML(template) {
+    const renderData = prepareResumeRenderData(SAMPLE_PROFILE);
+    const compiledTemplate = handlebars_1.default.compile(template.htmlContent);
+    const html = compiledTemplate(renderData);
+    const fullHtml = template.cssContent
+        ? `<style>${template.cssContent}</style>${html}`
+        : html;
+    return `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;padding:8px;background:#f3f4f6;">${fullHtml}</body></html>`;
 }
 async function getGeneratedPDFPath(filename) {
     const filepath = path_1.default.join(GENERATED_DIR, filename);

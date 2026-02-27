@@ -1,3 +1,20 @@
+/** Stored config for manual templates; enables edit. Matches ManualTemplateConfig shape. */
+export interface ManualTemplateConfigStored {
+    name: string;
+    description?: string;
+    columns: 1 | 2;
+    accentColor?: string;
+    bodyColor?: string;
+    bodyFontSizePt?: number;
+    titleFontSizePt?: number;
+    sectionOrder?: string[];
+    leftSectionOrder?: string[];
+    rightSectionOrder?: string[];
+    nameStyle?: Record<string, unknown>;
+    headerTitleStyle?: Record<string, unknown>;
+    contactStyle?: Record<string, unknown>;
+    sectionStyles?: Record<string, Record<string, Record<string, unknown>>>;
+}
 export interface Template {
     id: string;
     name: string;
@@ -8,6 +25,8 @@ export interface Template {
     sections: string[];
     createdAt: string;
     updatedAt: string;
+    /** Stored config for manual templates; enables edit */
+    manualConfig?: ManualTemplateConfigStored;
 }
 export interface CreateTemplateDTO {
     name: string;

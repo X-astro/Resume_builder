@@ -7,6 +7,7 @@ const express_1 = require("express");
 const multer_1 = __importDefault(require("multer"));
 const auth_1 = require("../middleware/auth");
 const templateExtractor_1 = require("../services/templateExtractor");
+const pdfGenerator_1 = require("../services/pdfGenerator");
 const router = (0, express_1.Router)();
 // Configure multer for PDF uploads
 const upload = (0, multer_1.default)({
@@ -40,6 +41,22 @@ router.get('/', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch templates' });
     }
 });
+// Get template preview HTML (sample data)
+router.get('/:id/preview', async (req, res) => {
+    try {
+        const template = await (0, templateExtractor_1.getTemplateById)(req.params.id);
+        if (!template) {
+            res.status(404).json({ error: 'Template not found' });
+            return;
+        }
+        const html = (0, pdfGenerator_1.generateTemplatePreviewHTML)(template);
+        res.type('html').send(html);
+    }
+    catch (error) {
+        console.error('Error generating template preview:', error);
+        res.status(500).json({ error: 'Failed to generate preview' });
+    }
+});
 // Get single template
 router.get('/:id', async (req, res) => {
     try {
@@ -52,6 +69,42 @@ router.get('/:id', async (req, res) => {
     }
     catch (error) {
         res.status(500).json({ error: 'Failed to fetch template' });
+    }
+});
+// Create manual template (protected)
+router.post('/create-manual', auth_1.authMiddleware, async (req, res) => {
+    try {
+        const config = req.body;
+        if (!config?.name?.trim()) {
+            res.status(400).json({ error: 'Template name is required' });
+            return;
+        }
+        const template = await (0, templateExtractor_1.createManualTemplate)({
+            name: config.name,
+            description: config.description,
+            columns: config.columns === 2 ? 2 : 1,
+            accentColor: config.accentColor || '#1e40af',
+            bodyColor: config.bodyColor || '#000',
+            bodyFontSizePt: config.bodyFontSizePt ?? 9,
+            titleFontSizePt: config.titleFontSizePt ?? 24,
+            sectionOrder: Array.isArray(config.sectionOrder) ? config.sectionOrder : [],
+            leftSectionOrder: Array.isArray(config.leftSectionOrder) ? config.leftSectionOrder : [],
+            rightSectionOrder: Array.isArray(config.rightSectionOrder) ? config.rightSectionOrder : [],
+            nameStyle: config.nameStyle,
+            headerTitleStyle: config.headerTitleStyle,
+            contactStyle: config.contactStyle,
+            titleStyle: config.titleStyle,
+            subTitleStyle: config.subTitleStyle,
+            paragraphStyle: config.paragraphStyle,
+            sectionStyles: config.sectionStyles,
+        });
+        res.status(201).json(template);
+    }
+    catch (error) {
+        console.error('Error creating manual template:', error);
+        res.status(500).json({
+            error: error instanceof Error ? error.message : 'Failed to create template',
+        });
     }
 });
 // Upload PDF and extract template (protected)
@@ -69,6 +122,46 @@ router.post('/upload', auth_1.authMiddleware, upload.single('pdf'), async (req, 
         console.error('Error extracting template:', error);
         res.status(500).json({
             error: error instanceof Error ? error.message : 'Failed to extract template from PDF'
+        });
+    }
+});
+// Update manual template (protected)
+router.put('/:id/update-manual', auth_1.authMiddleware, async (req, res) => {
+    try {
+        const config = req.body;
+        if (!config?.name?.trim()) {
+            res.status(400).json({ error: 'Template name is required' });
+            return;
+        }
+        const template = await (0, templateExtractor_1.updateManualTemplate)(req.params.id, {
+            name: config.name,
+            description: config.description,
+            columns: config.columns === 2 ? 2 : 1,
+            accentColor: config.accentColor || '#1e40af',
+            bodyColor: config.bodyColor || '#000',
+            bodyFontSizePt: config.bodyFontSizePt ?? 9,
+            titleFontSizePt: config.titleFontSizePt ?? 24,
+            sectionOrder: Array.isArray(config.sectionOrder) ? config.sectionOrder : [],
+            leftSectionOrder: Array.isArray(config.leftSectionOrder) ? config.leftSectionOrder : [],
+            rightSectionOrder: Array.isArray(config.rightSectionOrder) ? config.rightSectionOrder : [],
+            nameStyle: config.nameStyle,
+            headerTitleStyle: config.headerTitleStyle,
+            contactStyle: config.contactStyle,
+            titleStyle: config.titleStyle,
+            subTitleStyle: config.subTitleStyle,
+            paragraphStyle: config.paragraphStyle,
+            sectionStyles: config.sectionStyles,
+        });
+        if (!template) {
+            res.status(404).json({ error: 'Template not found' });
+            return;
+        }
+        res.json(template);
+    }
+    catch (error) {
+        console.error('Error updating manual template:', error);
+        res.status(500).json({
+            error: error instanceof Error ? error.message : 'Failed to update template',
         });
     }
 });
