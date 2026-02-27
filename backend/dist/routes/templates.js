@@ -165,11 +165,18 @@ router.put('/:id/update-manual', auth_1.authMiddleware, async (req, res) => {
         });
     }
 });
-// Update template (protected) - e.g. toggle disabled
+// Update template (protected) - e.g. toggle disabled, name, description
 router.patch('/:id', auth_1.authMiddleware, async (req, res) => {
     try {
-        const { disabled } = req.body;
-        const updated = await (0, templateExtractor_1.updateTemplate)(req.params.id, { disabled });
+        const { disabled, name, description } = req.body;
+        const updates = {};
+        if (typeof disabled === 'boolean')
+            updates.disabled = disabled;
+        if (typeof name === 'string')
+            updates.name = name.trim();
+        if (typeof description === 'string')
+            updates.description = description.trim();
+        const updated = await (0, templateExtractor_1.updateTemplate)(req.params.id, updates);
         if (!updated) {
             res.status(404).json({ error: 'Template not found' });
             return;

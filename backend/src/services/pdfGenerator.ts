@@ -258,11 +258,60 @@ function normalizeExperienceDescriptions<T extends { experience?: Array<{ descri
   };
 }
 
+const JOB_TITLE_EXCLUSIONS = new Set([
+  'full stack developer', 'fullstack developer', 'full-stack developer',
+  'frontend developer', 'front-end developer', 'frotnend developer',
+  'backend developer', 'back-end developer',
+  'full stack engineer', 'frontend engineer', 'backend engineer',
+  'software developer', 'software engineer',
+]);
+
+function capitalizeHardSkill(s: string): string {
+  if (!s || s.length === 0) return s;
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+const MAX_SOFT_SKILL_LENGTH = 30;
+const SOFT_SKILL_CONDENSE: Array<{ patterns: string[]; key: string }> = [
+  { patterns: ['excellent communication', 'communication and collaboration', 'communication skills'], key: 'Communication' },
+  { patterns: ['collaboration', 'collaborative'], key: 'Collaboration' },
+  { patterns: ['cross-functional', 'cross functional'], key: 'Cross-functional' },
+  { patterns: ['problem-solving', 'problem solving'], key: 'Problem-solving' },
+  { patterns: ['ownership', 'high ownership'], key: 'Ownership' },
+  { patterns: ['autonomy', 'self-directed', 'independent'], key: 'Autonomy' },
+  { patterns: ['transparency', 'transparent'], key: 'Transparency' },
+  { patterns: ['reliability', 'reliable'], key: 'Reliability' },
+  { patterns: ['supportive', 'support'], key: 'Supportive' },
+  { patterns: ['passionate', 'passion'], key: 'Passion' },
+  { patterns: ['mentorship', 'mentor', 'help fellow'], key: 'Mentorship' },
+  { patterns: ['adaptability', 'adapt'], key: 'Adaptability' },
+  { patterns: ['eager to learn', 'lifelong learning'], key: 'Eager to learn' },
+  { patterns: ['accountability', 'accountable'], key: 'Accountability' },
+  { patterns: ['attention to detail', 'detail-oriented'], key: 'Attention to detail' },
+  { patterns: ['team player', 'we are one team'], key: 'Team player' },
+  { patterns: ['diverse', 'diversity'], key: 'Diversity' },
+  { patterns: ['innovative', 'innovation', 'great ideas'], key: 'Innovation' },
+];
+
+function condenseSoftSkill(s: string): string {
+  const trimmed = s.trim();
+  if (trimmed.length <= MAX_SOFT_SKILL_LENGTH) {
+    return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+  }
+  const lower = trimmed.toLowerCase();
+  for (const { patterns, key } of SOFT_SKILL_CONDENSE) {
+    if (patterns.some((p) => lower.includes(p))) return key;
+  }
+  const firstWord = trimmed.split(/\s+/)[0];
+  return firstWord ? firstWord.charAt(0).toUpperCase() + firstWord.slice(1) : trimmed;
+}
+
 function isTechnicalSkill(skill: string): boolean {
   const normalized = skill.trim().replace(/\s+/g, ' ');
   if (!normalized || normalized.length > 50 || /[.!?]/.test(normalized)) return false;
 
   const lower = normalized.toLowerCase();
+  if (JOB_TITLE_EXCLUSIONS.has(lower)) return false;
   // Exclude soft skills (communication, collaboration, ownership, etc.)
   if (SOFT_SKILL_SIGNALS.some((signal) => lower.includes(signal))) return false;
 
@@ -303,16 +352,21 @@ type SkillsData = {
 };
 
 function applySkillsLimit<T extends SkillsData>(data: T): T {
-  // Merge required + preferred + hard (or legacy skills), then apply limits
   const MAX_SOFT_SKILLS = 10;
 
   const combinedHardRaw = data.hardSkills ?? data.skills ?? [];
+  const hardFiltered = normalizeSkills(combinedHardRaw as unknown[]).filter(isTechnicalSkill);
+  const hardLimited = hardFiltered.map(capitalizeHardSkill);
 
-  const hard = normalizeSkills(combinedHardRaw as unknown[]).filter(isTechnicalSkill);
-  const soft = prioritizeSoftSkills(normalizeSkills(data.softSkills));
-  const hardLimited = hard; // No limit on hard skills
-  const availableSoftSlots = MAX_SOFT_SKILLS;
-  const softLimited = soft.slice(0, availableSoftSlots);
+  const softRaw = prioritizeSoftSkills(normalizeSkills(data.softSkills));
+  const softCondensed = softRaw.slice(0, MAX_SOFT_SKILLS).map(condenseSoftSkill);
+  const softSeen = new Set<string>();
+  const softLimited = softCondensed.filter((s) => {
+    const key = s.toLowerCase();
+    if (softSeen.has(key)) return false;
+    softSeen.add(key);
+    return true;
+  });
 
   return {
     ...data,

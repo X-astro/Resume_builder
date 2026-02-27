@@ -380,15 +380,31 @@ function normalizeHardSkillAlias(skill: string): string {
   return skill.trim().toLowerCase().replace(/\s+/g, ' ');
 }
 
+/** Job titles to exclude from hard skills - these are roles, not technical skills */
+const JOB_TITLE_EXCLUSIONS = new Set([
+  'full stack developer', 'fullstack developer', 'full-stack developer',
+  'frontend developer', 'front-end developer', 'frotnend developer',
+  'backend developer', 'back-end developer',
+  'full stack engineer', 'frontend engineer', 'backend engineer',
+  'software developer', 'software engineer',
+]);
+
+function capitalizeHardSkill(s: string): string {
+  if (!s || s.length === 0) return s;
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
 function resolveHardSkill(skill: string): { display: string; category: HardSkillCategory } | null {
   const normalized = skill.trim().replace(/\s+/g, ' ');
   if (!normalized || normalized.length > 50 || /[.!?]/.test(normalized)) return null;
 
   const lower = normalizeHardSkillAlias(normalized);
+  // Exclude job titles (full stack developer, frontend developer, etc.)
+  if (JOB_TITLE_EXCLUSIONS.has(lower)) return null;
   // Exclude soft skills only (communication, collaboration, ownership, etc.)
   if (SOFT_SKILL_SIGNALS.some((signal) => lower.includes(signal))) return null;
 
-  // If in alias map, return canonical form
+  // If in alias map, return canonical form (already properly capitalized)
   const mapped = HARD_SKILL_ALIAS_MAP.get(lower);
   if (mapped) return mapped;
 
@@ -402,12 +418,12 @@ function resolveHardSkill(skill: string): { display: string; category: HardSkill
     'terraform', 'testing', 'celery', 'flutter', 'lambda', 'cloudflare',
   ];
   if (techIndicators.some((term) => lower.includes(term))) {
-    return { display: normalized, category: 'other' };
+    return { display: capitalizeHardSkill(normalized), category: 'other' };
   }
 
   // Single-word tech (Airflow, dbt, Kafka) - allow if looks like a tool/framework name
   if (/^[a-z0-9][a-z0-9+\-./]*$/.test(lower) && lower.length >= 2) {
-    return { display: normalized, category: 'other' };
+    return { display: capitalizeHardSkill(normalized), category: 'other' };
   }
 
   return null;
@@ -420,10 +436,11 @@ function normalizeAllowedHardSkills(skills: string[]): string[] {
   for (const raw of skills) {
     const resolved = resolveHardSkill(raw);
     if (!resolved) continue;
-    const key = resolved.display.toLowerCase();
+    const display = resolved.display;
+    const key = display.toLowerCase();
     if (seen.has(key)) continue;
     seen.add(key);
-    result.push(resolved.display);
+    result.push(display);
   }
 
   return result;
@@ -431,6 +448,48 @@ function normalizeAllowedHardSkills(skills: string[]): string[] {
 
 function isTechnicalSkill(skill: string): boolean {
   return resolveHardSkill(skill) !== null;
+}
+
+const MAX_SOFT_SKILL_LENGTH = 30;
+
+/** Map long soft skill phrases to short key points */
+const SOFT_SKILL_CONDENSE: Array<{ patterns: RegExp | string[]; key: string }> = [
+  { patterns: ['excellent communication', 'communication and collaboration', 'communication skills', 'communicate'], key: 'Communication' },
+  { patterns: ['collaboration', 'collaborative', 'collaborate'], key: 'Collaboration' },
+  { patterns: ['cross-functional', 'cross functional'], key: 'Cross-functional' },
+  { patterns: ['problem-solving', 'problem solving'], key: 'Problem-solving' },
+  { patterns: ['ownership', 'high ownership'], key: 'Ownership' },
+  { patterns: ['autonomy', 'self-directed', 'independent'], key: 'Autonomy' },
+  { patterns: ['transparency', 'transparent'], key: 'Transparency' },
+  { patterns: ['reliability', 'reliable'], key: 'Reliability' },
+  { patterns: ['supportive', 'support'], key: 'Supportive' },
+  { patterns: ['passionate', 'passion'], key: 'Passion' },
+  { patterns: ['mentorship', 'mentor', 'help fellow'], key: 'Mentorship' },
+  { patterns: ['adaptability', 'adapt'], key: 'Adaptability' },
+  { patterns: ['eager to learn', 'lifelong learning'], key: 'Eager to learn' },
+  { patterns: ['accountability', 'accountable'], key: 'Accountability' },
+  { patterns: ['attention to detail', 'detail-oriented'], key: 'Attention to detail' },
+  { patterns: ['team player', 'we are one team'], key: 'Team player' },
+  { patterns: ['diverse', 'diversity'], key: 'Diversity' },
+  { patterns: ['innovative', 'innovation', 'great ideas'], key: 'Innovation' },
+  { patterns: ['analytics', 'applied ai'], key: 'Analytics & AI' },
+  { patterns: ['scalable', 'polished'], key: 'Quality focus' },
+];
+
+function condenseSoftSkill(s: string): string {
+  const trimmed = s.trim();
+  if (trimmed.length <= MAX_SOFT_SKILL_LENGTH) {
+    return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+  }
+  const lower = trimmed.toLowerCase();
+  for (const { patterns, key } of SOFT_SKILL_CONDENSE) {
+    const matches = Array.isArray(patterns)
+      ? patterns.some((p) => lower.includes(p.toLowerCase()))
+      : (patterns as RegExp).test(lower);
+    if (matches) return key;
+  }
+  const firstWord = trimmed.split(/\s+/)[0];
+  return firstWord ? firstWord.charAt(0).toUpperCase() + firstWord.slice(1) : trimmed;
 }
 
 function prioritizeSoftSkills(skills: string[]): string[] {
@@ -647,7 +706,14 @@ function normalizeTailoredContent(content: TailoredContent, jobAnalysis?: JobAna
 
   const hardLimited = hardSkills; // No limit on hard skills
   const softSlots = MAX_SOFT_SKILLS;
-  const softLimited = softSkills.slice(0, softSlots);
+  const condensed = softSkills.slice(0, softSlots).map(condenseSoftSkill);
+  const softSeen = new Set<string>();
+  const softLimited = condensed.filter((s) => {
+    const key = s.toLowerCase();
+    if (softSeen.has(key)) return false;
+    softSeen.add(key);
+    return true;
+  });
 
   const trimIncompleteEnd = (s: string): string =>
     s.trim().replace(/,+\s*$/, '').replace(/\s+(and|or)\s*$/i, '').trim();
