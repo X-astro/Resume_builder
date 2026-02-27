@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Profile, CreateProfileDTO, Experience, Strength, Education, templatesApi, Template } from '@/lib/api';
+import { Profile, CreateProfileDTO, Experience, Strength, Education, templatesApi, profilesApi, Template } from '@/lib/api';
 
 interface ProfileFormProps {
   initialData?: Profile;
@@ -67,10 +67,22 @@ export default function ProfileForm({
   const [hardSkillInput, setHardSkillInput] = useState('');
   const [softSkillInput, setSoftSkillInput] = useState('');
   const [templates, setTemplates] = useState<Template[]>([]);
+  const [profiles, setProfiles] = useState<Profile[]>([]);
 
   useEffect(() => {
     templatesApi.getAll().then(setTemplates).catch(() => setTemplates([]));
   }, []);
+
+  useEffect(() => {
+    profilesApi.getAll({ includeDisabled: true }).then(setProfiles).catch(() => setProfiles([]));
+  }, []);
+
+  // Template IDs already selected by other profiles (exclude current profile when editing)
+  const templatesInUseByOthers = new Set(
+    profiles
+      .filter((p) => p.id !== initialData?.id && p.preferredTemplate)
+      .map((p) => p.preferredTemplate!)
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -284,11 +296,19 @@ export default function ProfileForm({
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">None (select in builder)</option>
-              {templates.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name}
-                </option>
-              ))}
+              {templates.map((t) => {
+                const isInUseByOther = templatesInUseByOthers.has(t.id);
+                return (
+                  <option
+                    key={t.id}
+                    value={t.id}
+                    disabled={isInUseByOther}
+                  >
+                    {t.name}
+                    {isInUseByOther ? ' (in use by another profile)' : ''}
+                  </option>
+                );
+              })}
             </select>
             <p className="mt-1 text-xs text-gray-500">
               When set, this template is used automatically when building resumes for this profile.

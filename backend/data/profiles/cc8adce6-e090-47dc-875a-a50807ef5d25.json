@@ -1,0 +1,69 @@
+{
+  "name": "You Lyu",
+  "title": "Senior Software Engineer",
+  "totalYearsExperience": 6,
+  "preferredTemplate": "two-column-slate",
+  "disabled": false,
+  "contact": {
+    "phone": "(415) 480-4235",
+    "email": "youlyu30@gmail.com",
+    "linkedin": "https://www.linkedin.com/in/you-lyu-77413b11a",
+    "github": "",
+    "portfolio": "",
+    "location": "San Francisco Bay Area"
+  },
+  "summary": "",
+  "experience": [
+    {
+      "title": "Senior Software Engineer",
+      "company": "Uber",
+      "startDate": "02/2023",
+      "endDate": "02/2026",
+      "location": "San Francisco Bay Area",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Software Engineer II",
+      "company": "Uber",
+      "startDate": "02/2021",
+      "endDate": "02/2023",
+      "location": "San Francisco Bay Area",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Software Engineer I",
+      "company": "Uber",
+      "startDate": "10/2019",
+      "endDate": "02/2021",
+      "location": "San Francisco Bay Area",
+      "description": "",
+      "achievements": []
+    }
+  ],
+  "strengths": [],
+  "skills": [],
+  "education": [
+    {
+      "degree": "Master of Science in Electrical and Computer Engineering",
+      "institution": "Duke University",
+      "startDate": "08/2017",
+      "endDate": "05/2019",
+      "location": "",
+      "gpa": ""
+    },
+    {
+      "degree": "First Class B.Eng. (Hons.) in Electrical and Electronics Engineering",
+      "institution": "University of Nottingham Ningbo China",
+      "startDate": "09/2012",
+      "endDate": "06/2016",
+      "location": "",
+      "gpa": ""
+    }
+  ],
+  "certifications": [],
+  "id": "cc8adce6-e090-47dc-875a-a50807ef5d25",
+  "createdAt": "2026-02-24T18:21:57.260Z",
+  "updatedAt": "2026-02-25T12:40:44.433Z"
+}

@@ -2,8 +2,8 @@
   "name": "Li Cheng",
   "title": "Senior FullStack Engineer",
   "totalYearsExperience": 7,
-  "preferredTemplate": "two-column-slate",
-  "disabled": true,
+  "preferredTemplate": "two-column-forest",
+  "disabled": false,
   "contact": {
     "phone": "(813) 492-5329",
     "email": "li.cheng.co919@gmail.com",
@@ -70,5 +70,5 @@
   "certifications": [],
   "id": "9e03386a-a0ee-4309-9c4a-940fefad7747",
   "createdAt": "2026-02-22T15:33:48.524Z",
-  "updatedAt": "2026-02-25T13:23:55.149Z"
+  "updatedAt": "2026-02-26T14:19:02.996Z"
 }

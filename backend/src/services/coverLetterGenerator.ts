@@ -29,7 +29,6 @@ function contentToHtmlParagraphs(content: string): string {
  * Structure: Dear Hiring Manager, {content}, Best regards, {Profile name}
  */
 function buildCoverLetterHTML(content: string, profileName: string): string {
-  const accentColor = '#2B5C8A';
   return `<!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"></head>
@@ -37,7 +36,7 @@ function buildCoverLetterHTML(content: string, profileName: string): string {
   <p style="margin: 0 0 24pt 0;">Dear Hiring Manager,</p>
   ${contentToHtmlParagraphs(content)}
   <p style="margin: 24pt 0 12pt 0;">Best regards,</p>
-  <p style="margin: 0; font-weight: bold; color: ${accentColor}; font-size: 12pt;">${esc(profileName.trim())}</p>
+  <p style="margin: 0; font-weight: bold; color: black; font-size: 12pt;">${esc(profileName.trim())}</p>
 </body>
 </html>`;
 }
@@ -47,7 +46,6 @@ function buildCoverLetterHTML(content: string, profileName: string): string {
  * Structure: Dear Hiring Manager, (line break), {content}, (line break), Best regards, {profile name}
  */
 function buildCoverLetterHTMLForDocx(content: string, profileName: string): string {
-  const accentColor = '#2B5C8A';
   const lineBreak = '<p style="margin: 0 0 12pt 0;"></p>';
   return `<!DOCTYPE html>
 <html>
@@ -58,7 +56,7 @@ function buildCoverLetterHTMLForDocx(content: string, profileName: string): stri
   ${contentToHtmlParagraphs(content)}
   ${lineBreak}
   <p style="margin: 0 0 12pt 0;">Best regards,</p>
-  <p style="margin: 0; font-weight: bold; color: ${accentColor}; font-size: 12pt;">${esc(profileName.trim())}</p>
+  <p style="margin: 0; font-weight: bold; color: black; font-size: 12pt;">${esc(profileName.trim())}</p>
 </body>
 </html>`;
 }

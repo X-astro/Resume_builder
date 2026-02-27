@@ -3,7 +3,7 @@
   "title": "Senior Software Engineer",
   "totalYearsExperience": 8,
   "preferredTemplate": "default",
-  "disabled": true,
+  "disabled": false,
   "contact": {
     "phone": "(415) 340-1296",
     "email": "tailinchu04@gmail.com",
@@ -83,5 +83,5 @@
   "certifications": [],
   "id": "54874495-f1c7-45fb-a48f-668b0fa2da4f",
   "createdAt": "2026-02-22T19:54:08.929Z",
-  "updatedAt": "2026-02-25T13:23:53.917Z"
+  "updatedAt": "2026-02-26T02:01:30.353Z"
 }

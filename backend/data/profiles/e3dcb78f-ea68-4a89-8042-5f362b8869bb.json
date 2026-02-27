@@ -1,0 +1,83 @@
+{
+  "name": "Ryan Jung",
+  "title": "Senior Software Engineer",
+  "totalYearsExperience": 7,
+  "preferredTemplate": "default",
+  "disabled": false,
+  "contact": {
+    "phone": "(628)238-8357",
+    "email": "rjung.sf@gmail.com",
+    "linkedin": "https://www.linkedin.com/in/ryan-jung-ba6298160/",
+    "github": "",
+    "portfolio": "",
+    "location": "San Francisco, CA"
+  },
+  "summary": "",
+  "experience": [
+    {
+      "title": "Senior Software Engineer",
+      "company": "Walmart Global Tech",
+      "startDate": "01/2025",
+      "endDate": "Present",
+      "location": "San Francisco, CA",
+      "description": "Lead architectural design and implementation of high-availability microservices and large-scale data pipelines supporting high-throughput retail systems on Google Cloud Platform.",
+      "achievements": []
+    },
+    {
+      "title": "Software Engineer",
+      "company": "Walmart Global Tech",
+      "startDate": "06/2022",
+      "endDate": "01/2025",
+      "location": "San Francisco, CA",
+      "description": "Built and maintained scalable backend services and data processing pipelines supporting Walmart's global supply chain operations on GCP.",
+      "achievements": []
+    },
+    {
+      "title": "Full Stack Software Engineer",
+      "company": "OpenText",
+      "startDate": "10/2018",
+      "endDate": "06/2022",
+      "location": "San Francisco, CA",
+      "description": "Engineered full-stack enterprise content management features and optimized database performance for a global SaaS user base.",
+      "achievements": []
+    },
+    {
+      "title": "Software Developer Intern",
+      "company": "California Public Utilities Commission",
+      "startDate": "07/2017",
+      "endDate": "10/2018",
+      "location": "San Francisco, CA",
+      "description": "Developed a web-based regulatory fee filing application and responsive front-end interfaces for government stakeholders.",
+      "achievements": []
+    }
+  ],
+  "strengths": [
+    {
+      "title": "",
+      "description": ""
+    },
+    {
+      "title": "",
+      "description": ""
+    },
+    {
+      "title": "",
+      "description": ""
+    }
+  ],
+  "skills": [],
+  "education": [
+    {
+      "degree": "Bachelor of Science, Computer Science",
+      "institution": "San Francisco State University",
+      "startDate": "2014",
+      "endDate": "2018",
+      "location": "",
+      "gpa": ""
+    }
+  ],
+  "certifications": [],
+  "id": "e3dcb78f-ea68-4a89-8042-5f362b8869bb",
+  "createdAt": "2026-02-26T13:49:31.835Z",
+  "updatedAt": "2026-02-26T15:02:47.139Z"
+}

@@ -53,6 +53,7 @@ export default function AdminLayout({
 
   useEffect(() => {
     let isMounted = true;
+    setIsLoading(true);
     const safetyTimer = window.setTimeout(() => {
       if (isMounted) setIsLoading(false);
     }, AUTH_VERIFY_TIMEOUT_MS + 1500);
@@ -65,7 +66,7 @@ export default function AdminLayout({
       isMounted = false;
       window.clearTimeout(safetyTimer);
     };
-  }, [checkAuth]);
+  }, [checkAuth, pathname]);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated && pathname !== '/admin') {

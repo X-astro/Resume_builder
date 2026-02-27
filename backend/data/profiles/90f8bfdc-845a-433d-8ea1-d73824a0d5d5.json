@@ -2,8 +2,8 @@
   "name": "Zesheng Cai",
   "title": "Senior Software Engineer",
   "totalYearsExperience": 13,
-  "preferredTemplate": "default",
-  "disabled": true,
+  "preferredTemplate": "one-column-amber",
+  "disabled": false,
   "contact": {
     "phone": "(650) 516-7947",
     "email": "zesheng.cai.tech@gmail.com",
@@ -114,5 +114,5 @@
   "certifications": [],
   "id": "90f8bfdc-845a-433d-8ea1-d73824a0d5d5",
   "createdAt": "2026-02-23T13:13:44.103Z",
-  "updatedAt": "2026-02-25T13:24:04.765Z"
+  "updatedAt": "2026-02-26T14:18:58.028Z"
 }
