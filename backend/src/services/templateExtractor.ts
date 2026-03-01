@@ -129,6 +129,76 @@ export async function updateTemplate(id: string, updates: Partial<Pick<Template,
   return updated;
 }
 
+const BUILT_IN_TEMPLATE_IDS = new Set([
+  'default', 'one-column', 'one-column-modern',
+  'two-column-navy', 'one-column-emerald', 'one-column-violet', 'one-column-rose',
+  'two-column-slate', 'one-column-amber', 'one-column-indigo', 'two-column-minimal',
+  'one-column-serif', 'two-column-teal', 'one-column-coral', 'two-column-forest',
+]);
+
+export async function uploadJsonTemplate(
+  jsonBuffer: Buffer,
+  options?: { overrideId?: string }
+): Promise<Template> {
+  await ensureDirectories();
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(jsonBuffer.toString('utf-8'));
+  } catch (e) {
+    throw new Error('Invalid JSON: ' + (e instanceof Error ? e.message : 'Parse error'));
+  }
+
+  const obj = parsed as Record<string, unknown>;
+  if (!obj || typeof obj !== 'object') {
+    throw new Error('Template must be a JSON object');
+  }
+
+  const name = typeof obj.name === 'string' ? obj.name.trim() : '';
+  const htmlContent = typeof obj.htmlContent === 'string' ? obj.htmlContent : '';
+  const sections = Array.isArray(obj.sections) ? obj.sections.filter((s): s is string => typeof s === 'string') : [];
+
+  if (!name) throw new Error('Template must have a "name" field');
+  if (!htmlContent || htmlContent.length < 100) {
+    throw new Error('Template must have "htmlContent" with valid HTML');
+  }
+  if (sections.length === 0) {
+    throw new Error('Template must have a "sections" array');
+  }
+
+  let id = typeof obj.id === 'string' ? obj.id.replace(/\.json$/, '').trim() : '';
+  if (options?.overrideId) id = options.overrideId.replace(/\.json$/, '').trim();
+  if (!id || BUILT_IN_TEMPLATE_IDS.has(id)) {
+    id = `u-${uuidv4().slice(0, 8)}`;
+  }
+  id = id.replace(/[^a-zA-Z0-9\-_]/g, '-');
+
+  const existing = await getTemplateById(id);
+  if (existing) {
+    id = `u-${uuidv4().slice(0, 8)}`;
+  }
+
+  const now = new Date().toISOString();
+  const template: Template = {
+    id,
+    name,
+    description: typeof obj.description === 'string' ? obj.description.trim() : '',
+    disabled: typeof obj.disabled === 'boolean' ? obj.disabled : false,
+    htmlContent,
+    cssContent: typeof obj.cssContent === 'string' ? obj.cssContent : '',
+    sections,
+    createdAt: typeof obj.createdAt === 'string' ? obj.createdAt : now,
+    updatedAt: now,
+    ...(obj.manualConfig && typeof obj.manualConfig === 'object'
+      ? { manualConfig: obj.manualConfig as Template['manualConfig'] }
+      : {}),
+  };
+
+  const templatePath = path.join(TEMPLATES_DIR, `${template.id}.json`);
+  await fs.writeFile(templatePath, JSON.stringify(template, null, 2));
+  return template;
+}
+
 export async function deleteTemplate(id: string): Promise<boolean> {
   const normalizedId = id.replace(/\.json$/, '');
   const templatePath = path.join(TEMPLATES_DIR, `${normalizedId}.json`);

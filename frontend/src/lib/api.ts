@@ -313,6 +313,16 @@ export const templatesApi = {
     });
   },
 
+  uploadJson: async (file: File): Promise<Template> => {
+    const formData = new FormData();
+    formData.append('template', file);
+
+    return apiFetch<Template>('/templates/upload-json', {
+      method: 'POST',
+      body: formData,
+    });
+  },
+
   delete: (id: string) =>
     apiFetch<{ message: string }>(`/templates/${id}`, {
       method: 'DELETE',

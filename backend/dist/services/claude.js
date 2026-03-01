@@ -357,7 +357,7 @@ function normalizeHardSkillAlias(skill) {
 /** Job titles to exclude from hard skills - these are roles, not technical skills */
 const JOB_TITLE_EXCLUSIONS = new Set([
     'full stack developer', 'fullstack developer', 'full-stack developer',
-    'frontend developer', 'front-end developer',
+    'frontend developer', 'front-end developer', 'frotnend developer',
     'backend developer', 'back-end developer',
     'full stack engineer', 'frontend engineer', 'backend engineer',
     'software developer', 'software engineer',

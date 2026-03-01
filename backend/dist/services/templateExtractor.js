@@ -7,6 +7,7 @@ exports.extractAndSaveTemplate = extractAndSaveTemplate;
 exports.getAllTemplates = getAllTemplates;
 exports.getTemplateById = getTemplateById;
 exports.updateTemplate = updateTemplate;
+exports.uploadJsonTemplate = uploadJsonTemplate;
 exports.deleteTemplate = deleteTemplate;
 exports.createDefaultTemplate = createDefaultTemplate;
 exports.createManualTemplate = createManualTemplate;
@@ -120,6 +121,66 @@ async function updateTemplate(id, updates) {
     const templatePath = path_1.default.join(TEMPLATES_DIR, `${normalizedId}.json`);
     await promises_1.default.writeFile(templatePath, JSON.stringify(updated, null, 2));
     return updated;
+}
+const BUILT_IN_TEMPLATE_IDS = new Set([
+    'default', 'one-column', 'one-column-modern',
+    'two-column-navy', 'one-column-emerald', 'one-column-violet', 'one-column-rose',
+    'two-column-slate', 'one-column-amber', 'one-column-indigo', 'two-column-minimal',
+    'one-column-serif', 'two-column-teal', 'one-column-coral', 'two-column-forest',
+]);
+async function uploadJsonTemplate(jsonBuffer, options) {
+    await ensureDirectories();
+    let parsed;
+    try {
+        parsed = JSON.parse(jsonBuffer.toString('utf-8'));
+    }
+    catch (e) {
+        throw new Error('Invalid JSON: ' + (e instanceof Error ? e.message : 'Parse error'));
+    }
+    const obj = parsed;
+    if (!obj || typeof obj !== 'object') {
+        throw new Error('Template must be a JSON object');
+    }
+    const name = typeof obj.name === 'string' ? obj.name.trim() : '';
+    const htmlContent = typeof obj.htmlContent === 'string' ? obj.htmlContent : '';
+    const sections = Array.isArray(obj.sections) ? obj.sections.filter((s) => typeof s === 'string') : [];
+    if (!name)
+        throw new Error('Template must have a "name" field');
+    if (!htmlContent || htmlContent.length < 100) {
+        throw new Error('Template must have "htmlContent" with valid HTML');
+    }
+    if (sections.length === 0) {
+        throw new Error('Template must have a "sections" array');
+    }
+    let id = typeof obj.id === 'string' ? obj.id.replace(/\.json$/, '').trim() : '';
+    if (options?.overrideId)
+        id = options.overrideId.replace(/\.json$/, '').trim();
+    if (!id || BUILT_IN_TEMPLATE_IDS.has(id)) {
+        id = `u-${(0, uuid_1.v4)().slice(0, 8)}`;
+    }
+    id = id.replace(/[^a-zA-Z0-9\-_]/g, '-');
+    const existing = await getTemplateById(id);
+    if (existing) {
+        id = `u-${(0, uuid_1.v4)().slice(0, 8)}`;
+    }
+    const now = new Date().toISOString();
+    const template = {
+        id,
+        name,
+        description: typeof obj.description === 'string' ? obj.description.trim() : '',
+        disabled: typeof obj.disabled === 'boolean' ? obj.disabled : false,
+        htmlContent,
+        cssContent: typeof obj.cssContent === 'string' ? obj.cssContent : '',
+        sections,
+        createdAt: typeof obj.createdAt === 'string' ? obj.createdAt : now,
+        updatedAt: now,
+        ...(obj.manualConfig && typeof obj.manualConfig === 'object'
+            ? { manualConfig: obj.manualConfig }
+            : {}),
+    };
+    const templatePath = path_1.default.join(TEMPLATES_DIR, `${template.id}.json`);
+    await promises_1.default.writeFile(templatePath, JSON.stringify(template, null, 2));
+    return template;
 }
 async function deleteTemplate(id) {
     const normalizedId = id.replace(/\.json$/, '');

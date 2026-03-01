@@ -3,6 +3,9 @@ export declare function extractAndSaveTemplate(pdfBuffer: Buffer, templateName: 
 export declare function getAllTemplates(): Promise<Template[]>;
 export declare function getTemplateById(id: string): Promise<Template | null>;
 export declare function updateTemplate(id: string, updates: Partial<Pick<Template, 'disabled' | 'name' | 'description'>>): Promise<Template | null>;
+export declare function uploadJsonTemplate(jsonBuffer: Buffer, options?: {
+    overrideId?: string;
+}): Promise<Template>;
 export declare function deleteTemplate(id: string): Promise<boolean>;
 export declare function createDefaultTemplate(): Promise<Template>;
 export interface ElementStyle {

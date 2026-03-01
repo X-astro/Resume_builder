@@ -72,12 +72,17 @@ export default function TemplatesPage() {
   const [error, setError] = useState('');
   const [uploadError, setUploadError] = useState('');
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [showJsonUploadModal, setShowJsonUploadModal] = useState(false);
   const [showManualModal, setShowManualModal] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<Template | null>(null);
   const [editingBasicTemplate, setEditingBasicTemplate] = useState<Template | null>(null);
   const [templateName, setTemplateName] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedJsonFile, setSelectedJsonFile] = useState<File | null>(null);
+  const [jsonUploadError, setJsonUploadError] = useState('');
+  const [isJsonUploading, setIsJsonUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const jsonFileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     loadTemplates();
@@ -182,6 +187,45 @@ export default function TemplatesPage() {
     }
   };
 
+  const handleJsonFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.name.toLowerCase().endsWith('.json')) {
+        setJsonUploadError('Please select a JSON file');
+        return;
+      }
+      setSelectedJsonFile(file);
+      setJsonUploadError('');
+    }
+  };
+
+  const handleJsonUpload = async () => {
+    if (!selectedJsonFile) {
+      setJsonUploadError('Please select a JSON file');
+      return;
+    }
+    setIsJsonUploading(true);
+    setJsonUploadError('');
+    try {
+      await templatesApi.uploadJson(selectedJsonFile);
+      await loadTemplates();
+      setShowJsonUploadModal(false);
+      setSelectedJsonFile(null);
+      if (jsonFileInputRef.current) jsonFileInputRef.current.value = '';
+    } catch (err) {
+      setJsonUploadError(err instanceof Error ? err.message : 'Failed to upload template');
+    } finally {
+      setIsJsonUploading(false);
+    }
+  };
+
+  const closeJsonModal = () => {
+    setShowJsonUploadModal(false);
+    setSelectedJsonFile(null);
+    setJsonUploadError('');
+    if (jsonFileInputRef.current) jsonFileInputRef.current.value = '';
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -194,12 +238,18 @@ export default function TemplatesPage() {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Resume Templates</h1>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button
             onClick={() => setShowManualModal(true)}
             className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium"
           >
             Add Manual Template
+          </button>
+          <button
+            onClick={() => setShowJsonUploadModal(true)}
+            className="px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 font-medium"
+          >
+            Upload JSON Template
           </button>
           <button
             onClick={() => setShowUploadModal(true)}
@@ -239,6 +289,90 @@ export default function TemplatesPage() {
           onSave={handleBasicEditSave}
           onCancel={() => setEditingBasicTemplate(null)}
         />
+      )}
+
+      {/* Upload JSON Template Modal */}
+      {showJsonUploadModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-md w-full p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Upload JSON Template</h2>
+              <button
+                onClick={closeJsonModal}
+                className="text-gray-500 hover:text-gray-700 p-1"
+                aria-label="Close"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <p className="text-sm text-gray-600 mb-4">
+              Upload a template JSON file with <code className="text-xs bg-gray-100 px-1 rounded">name</code>, <code className="text-xs bg-gray-100 px-1 rounded">htmlContent</code>, <code className="text-xs bg-gray-100 px-1 rounded">sections</code>, and optional <code className="text-xs bg-gray-100 px-1 rounded">description</code>, <code className="text-xs bg-gray-100 px-1 rounded">cssContent</code>.
+            </p>
+
+            {jsonUploadError && (
+              <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
+                {jsonUploadError}
+              </div>
+            )}
+
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-violet-500 transition-colors mb-4">
+              <input
+                ref={jsonFileInputRef}
+                type="file"
+                accept=".json,application/json"
+                onChange={handleJsonFileSelect}
+                className="hidden"
+                id="json-upload"
+              />
+              <label htmlFor="json-upload" className="cursor-pointer">
+                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <p className="mt-2 text-sm text-gray-600">
+                  {selectedJsonFile ? (
+                    <span className="text-violet-600 font-medium">{selectedJsonFile.name}</span>
+                  ) : (
+                    <>
+                      <span className="text-violet-600 hover:text-violet-700">Click to upload</span> or drag and drop
+                    </>
+                  )}
+                </p>
+                <p className="mt-1 text-xs text-gray-500">JSON only, max 2MB</p>
+              </label>
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={closeJsonModal}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleJsonUpload}
+                disabled={isJsonUploading || !selectedJsonFile}
+                className="px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isJsonUploading ? (
+                  <span className="flex items-center">
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Uploading...
+                  </span>
+                ) : (
+                  'Upload'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {showUploadModal && (
@@ -400,12 +534,18 @@ export default function TemplatesPage() {
           <p className="mt-1 text-sm text-gray-500">
             Upload a PDF resume to extract its design as a template.
           </p>
-          <div className="mt-6 flex gap-2 justify-center">
+          <div className="mt-6 flex flex-wrap gap-2 justify-center">
             <button
               onClick={() => setShowManualModal(true)}
               className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
             >
               Add Manual Template
+            </button>
+            <button
+              onClick={() => setShowJsonUploadModal(true)}
+              className="px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700"
+            >
+              Upload JSON Template
             </button>
             <button
               onClick={() => setShowUploadModal(true)}

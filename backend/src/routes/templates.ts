@@ -10,6 +10,7 @@ import {
   createDefaultTemplate,
   createManualTemplate,
   updateManualTemplate,
+  uploadJsonTemplate,
   type ManualTemplateConfig,
 } from '../services/templateExtractor';
 import { generateTemplatePreviewHTML } from '../services/pdfGenerator';
@@ -17,18 +18,27 @@ import { generateTemplatePreviewHTML } from '../services/pdfGenerator';
 const router = Router();
 
 // Configure multer for PDF uploads
-const upload = multer({
+const uploadPdf = multer({
   storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 10 * 1024 * 1024 // 10MB limit
-  },
+  limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
-    if (file.mimetype === 'application/pdf') {
-      cb(null, true);
-    } else {
-      cb(new Error('Only PDF files are allowed'));
-    }
-  }
+    if (file.mimetype === 'application/pdf') cb(null, true);
+    else cb(new Error('Only PDF files are allowed'));
+  },
+});
+
+// Configure multer for JSON template uploads
+const uploadJson = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 2 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const ok =
+      file.mimetype === 'application/json' ||
+      file.mimetype === 'application/octet-stream' ||
+      file.originalname?.toLowerCase().endsWith('.json');
+    if (ok) cb(null, true);
+    else cb(new Error('Only JSON files are allowed'));
+  },
 });
 
 // Get all templates
@@ -115,8 +125,25 @@ router.post('/create-manual', authMiddleware, async (req: Request, res: Response
   }
 });
 
+// Upload JSON template (protected)
+router.post('/upload-json', authMiddleware, uploadJson.single('template'), async (req: Request, res: Response) => {
+  try {
+    if (!req.file) {
+      res.status(400).json({ error: 'No JSON file uploaded' });
+      return;
+    }
+    const template = await uploadJsonTemplate(req.file.buffer);
+    res.status(201).json(template);
+  } catch (error) {
+    console.error('Error uploading JSON template:', error);
+    res.status(400).json({
+      error: error instanceof Error ? error.message : 'Failed to upload template',
+    });
+  }
+});
+
 // Upload PDF and extract template (protected)
-router.post('/upload', authMiddleware, upload.single('pdf'), async (req: Request, res: Response) => {
+router.post('/upload', authMiddleware, uploadPdf.single('pdf'), async (req: Request, res: Response) => {
   try {
     if (!req.file) {
       res.status(400).json({ error: 'No PDF file uploaded' });

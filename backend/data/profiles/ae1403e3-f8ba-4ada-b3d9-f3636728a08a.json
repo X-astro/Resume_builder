@@ -1,0 +1,69 @@
+{
+  "name": "Sagar Nuepane",
+  "title": "Senior Full Stack Engineer",
+  "preferredTemplate": "",
+  "disabled": false,
+  "contact": {
+    "phone": "(737) 378-1867",
+    "email": "sagar.neupane2567@gmail.com",
+    "linkedin": "https://www.linkedin.com/in/sagar-neupane-49627060",
+    "github": "",
+    "portfolio": "",
+    "location": "Cary, NC"
+  },
+  "summary": "",
+  "experience": [
+    {
+      "title": "Senior Full Stack Engineer",
+      "company": "Haneke Design",
+      "startDate": "09/2021",
+      "endDate": "Present",
+      "location": "Remote",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Lead Developer",
+      "company": "Arrowheads.co.jp",
+      "startDate": "11/2022",
+      "endDate": "07/2023",
+      "location": "Remote",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Full Stack Developer",
+      "company": "Offers",
+      "startDate": "08/2018",
+      "endDate": "07/2021",
+      "location": "Remote",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Back End Developer",
+      "company": "GE HealthCare",
+      "startDate": "02/2014",
+      "endDate": "05/2018",
+      "location": "GE HealthCare",
+      "description": "",
+      "achievements": []
+    }
+  ],
+  "strengths": [],
+  "skills": [],
+  "education": [
+    {
+      "degree": "Bachelor of Computer Science",
+      "institution": "Texas Tech University",
+      "startDate": "04/2010",
+      "endDate": "09/2013",
+      "location": "Lubbock, TX",
+      "gpa": ""
+    }
+  ],
+  "certifications": [],
+  "id": "ae1403e3-f8ba-4ada-b3d9-f3636728a08a",
+  "createdAt": "2026-02-27T02:33:40.614Z",
+  "updatedAt": "2026-02-27T02:33:40.614Z"
+}
