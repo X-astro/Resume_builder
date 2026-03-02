@@ -1,0 +1,61 @@
+{
+  "name": "Tun Yi Tan",
+  "title": "Senior Software Engineer",
+  "totalYearsExperience": 8,
+  "preferredTemplate": "b6bfa346-60eb-43a2-9a08-c60c013971c6",
+  "disabled": false,
+  "contact": {
+    "phone": "(757) 304-0199",
+    "email": "tunyitan14@gmail.com",
+    "linkedin": "https://www.linkedin.com/in/tun-tan-239ab73a9",
+    "github": "",
+    "portfolio": "",
+    "location": "Centreville, VA"
+  },
+  "summary": "",
+  "experience": [
+    {
+      "title": "Senior Software Engineer",
+      "company": "Nexthink",
+      "startDate": "01/2022",
+      "endDate": "Present",
+      "location": "Remote",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Software Engineer",
+      "company": "ClearSummit",
+      "startDate": "09/2019",
+      "endDate": "12/2021",
+      "location": "Remote",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Junior Software Engineer",
+      "company": "Willow Tree",
+      "startDate": "07/2017",
+      "endDate": "08/2019",
+      "location": "Charlottesville, VA",
+      "description": "",
+      "achievements": []
+    }
+  ],
+  "strengths": [],
+  "skills": [],
+  "education": [
+    {
+      "degree": "Bachelor of Computer Science",
+      "institution": "University of Virginia (UVA)",
+      "startDate": "08/2015",
+      "endDate": "05/2019",
+      "location": "Charlottesville, VA",
+      "gpa": ""
+    }
+  ],
+  "certifications": [],
+  "id": "d657b517-5451-481e-be2e-0ee1f38dc999",
+  "createdAt": "2026-03-02T00:58:19.026Z",
+  "updatedAt": "2026-03-02T00:58:19.026Z"
+}

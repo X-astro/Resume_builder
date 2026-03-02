@@ -1,0 +1,87 @@
+{
+  "name": "Ryan Pham",
+  "title": "Senior Software Engineer",
+  "totalYearsExperience": 7,
+  "preferredTemplate": "one-column-serif",
+  "disabled": false,
+  "contact": {
+    "phone": "(408) 634-6387‬",
+    "email": "ryan.pham754@gmail.com",
+    "linkedin": "https://www.linkedin.com/in/ryph/",
+    "github": "",
+    "portfolio": "",
+    "location": "Oakley, CA"
+  },
+  "summary": "",
+  "experience": [
+    {
+      "title": "Senior Software Engineer",
+      "company": "Barracuda",
+      "startDate": "07/2021",
+      "endDate": "Present",
+      "location": "Campbell, CA",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Founder & CTO",
+      "company": "ShelfDB | Part-time",
+      "startDate": "09/2023",
+      "endDate": "Present",
+      "location": "San Francisco, CA",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Data Foundations Developer",
+      "company": "Facebook",
+      "startDate": "05/2020",
+      "endDate": "06/2021",
+      "location": "Menlo Park, CA",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Test Engineer",
+      "company": "Yellowbrick Data",
+      "startDate": "04/2019",
+      "endDate": "05/2020",
+      "location": "Palo Alto, CA",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Data Engineeer",
+      "company": "Lodestone",
+      "startDate": "07/2018",
+      "endDate": "03/2019",
+      "location": "Menlo Park, CA",
+      "description": "",
+      "achievements": []
+    }
+  ],
+  "strengths": [],
+  "skills": [],
+  "education": [
+    {
+      "degree": "Bachelor’s Degree, Computer Science",
+      "institution": "California State University - East Bay",
+      "startDate": "06/2016",
+      "endDate": "05/2018",
+      "location": "",
+      "gpa": ""
+    },
+    {
+      "degree": "Associate's Degree, Computer Science",
+      "institution": "Los Medanos College",
+      "startDate": "04/2014",
+      "endDate": "03/2016",
+      "location": "",
+      "gpa": ""
+    }
+  ],
+  "certifications": [],
+  "id": "7304744f-5a99-4520-b84a-3732b0e3b023",
+  "createdAt": "2026-03-02T02:14:10.528Z",
+  "updatedAt": "2026-03-02T02:14:10.528Z"
+}

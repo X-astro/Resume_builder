@@ -8,6 +8,8 @@ import profileRoutes from './routes/profiles';
 import templateRoutes from './routes/templates';
 import resumeRoutes from './routes/resume';
 import adminRoutes from './routes/admin';
+import authRoutes from './routes/auth';
+import userRoutes from './routes/users';
 
 dotenv.config({ path: path.join(__dirname, '../../.env') });
 
@@ -46,6 +48,8 @@ app.use('/api/profiles', profileRoutes);
 app.use('/api/templates', templateRoutes);
 app.use('/api/resume', resumeRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

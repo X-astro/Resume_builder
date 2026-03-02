@@ -1,0 +1,13 @@
+{
+  "id": "6e9e575d-bd51-4660-9b67-b17bd5e8c2e6",
+  "email": "a@a.com",
+  "passwordHash": "$2b$10$sFfIgKOkTCtEW1V0q0bSv.DKIE3VoSh5BfozTnNW.xmYxh2ZKYXy6",
+  "name": "A",
+  "multipleProfileIds": [
+    "99d20129-d2f5-4acc-9462-71df04d0ffc8",
+    "1d9d0957-5116-449a-8c5f-89ef117d47cf",
+    "f38556d3-61bf-491a-b254-1952ee9df701"
+  ],
+  "createdAt": "2026-03-02T14:55:58.217Z",
+  "updatedAt": "2026-03-02T15:19:08.568Z"
+}

@@ -2,7 +2,7 @@
   "name": "Michael Mehok",
   "title": "Senior Software Engineer",
   "totalYearsExperience": 12,
-  "preferredTemplate": "one-column-michael",
+  "preferredTemplate": "dd15eb59-7910-4ffe-a3f4-170a82159a75",
   "disabled": false,
   "contact": {
     "phone": "(707) 928-8988",
@@ -10,7 +10,7 @@
     "linkedin": "https://www.linkedin.com/in/michael-mehok-4608721a4",
     "github": "",
     "portfolio": "",
-    "location": "Austin, TX 78729"
+    "location": "Austin, TX"
   },
   "summary": "",
   "experience": [
@@ -24,28 +24,10 @@
       "achievements": []
     },
     {
-      "title": "Senior Software Engineer",
-      "company": "Kasasa",
-      "startDate": "02/2019",
-      "endDate": "04/2020",
-      "location": "Austin, TX",
-      "description": "",
-      "achievements": []
-    },
-    {
       "title": "Software Engineer",
       "company": "Kasasa",
-      "startDate": "10/2015",
-      "endDate": "02/2019",
-      "location": "Austin, TX",
-      "description": "",
-      "achievements": []
-    },
-    {
-      "title": "Associate Software Engineer",
-      "company": "Kasasa",
       "startDate": "08/2013",
-      "endDate": "10/2015",
+      "endDate": "04/2020",
       "location": "Austin, TX",
       "description": "",
       "achievements": []
@@ -73,7 +55,7 @@
     }
   ],
   "certifications": [],
-  "id": "1bc6a161-15f2-4cc0-8e90-6fc31f087563",
-  "createdAt": "2026-02-27T02:25:23.279Z",
-  "updatedAt": "2026-02-27T02:25:23.279Z"
+  "id": "c76f212d-2975-468e-94fa-8a99b5491ef7",
+  "createdAt": "2026-03-02T00:48:08.985Z",
+  "updatedAt": "2026-03-02T00:48:08.985Z"
 }

@@ -1,0 +1,60 @@
+{
+  "name": "Huijie Pan",
+  "title": "Senior Software Engineer",
+  "totalYearsExperience": 6,
+  "preferredTemplate": "38606723-9742-4b34-88b8-0a9abec5d063",
+  "disabled": false,
+  "contact": {
+    "phone": "(364) 217-3928",
+    "email": "huijie.pan155@gmail.com",
+    "linkedin": "https://www.linkedin.com/in/huijie-pan1996",
+    "github": "",
+    "portfolio": "",
+    "location": "San Jose, CA"
+  },
+  "summary": "",
+  "experience": [
+    {
+      "title": "Senior Software Engineer",
+      "company": "PayPal",
+      "startDate": "02/2022",
+      "endDate": "Present",
+      "location": "San Jose, CA",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Software Engineer",
+      "company": "PayPal",
+      "startDate": "04/2021",
+      "endDate": "02/2022",
+      "location": "San Jose, CA",
+      "description": "",
+      "achievements": []
+    }
+  ],
+  "strengths": [],
+  "skills": [],
+  "education": [
+    {
+      "degree": "M.S., Computer Engineering",
+      "institution": "University of California",
+      "startDate": "08/2018",
+      "endDate": "05/2020",
+      "location": "Santa Cruz",
+      "gpa": ""
+    },
+    {
+      "degree": "B.S., Computer Engineering",
+      "institution": "University of California",
+      "startDate": "08/2014",
+      "endDate": "05/2018",
+      "location": "Santa Cruz",
+      "gpa": ""
+    }
+  ],
+  "certifications": [],
+  "id": "4fe17a07-62cb-4412-a3f5-9f5a846ba9ae",
+  "createdAt": "2026-03-02T00:52:30.123Z",
+  "updatedAt": "2026-03-02T00:52:30.123Z"
+}

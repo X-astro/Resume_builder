@@ -2,7 +2,7 @@
   "name": "Justin Young",
   "title": "Senior Software Engineer",
   "totalYearsExperience": 6,
-  "preferredTemplate": "one-column-just (2)",
+  "preferredTemplate": "one-column-justin",
   "disabled": false,
   "contact": {
     "phone": "(628) 215-0964",
@@ -84,5 +84,5 @@
   "certifications": [],
   "id": "b8f5dbe4-cec0-47a4-818e-d4e1d16e34b2",
   "createdAt": "2026-02-22T23:52:34.236Z",
-  "updatedAt": "2026-02-26T13:48:18.785Z"
+  "updatedAt": "2026-03-02T01:58:32.001Z"
 }

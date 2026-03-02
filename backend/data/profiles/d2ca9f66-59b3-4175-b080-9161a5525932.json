@@ -1,0 +1,61 @@
+{
+  "name": "Andrew Mcguinness",
+  "title": "Senior Software Engineer",
+  "totalYearsExperience": 10,
+  "preferredTemplate": "701cf5ee-ef2e-461e-ac33-a4a98b29672b",
+  "disabled": false,
+  "contact": {
+    "phone": "(737) 231-0408",
+    "email": "mcguinnessandrew12@gmail.com",
+    "linkedin": "https://www.linkedin.com/in/andrew-mcguinness-554344214",
+    "github": "",
+    "portfolio": "",
+    "location": "Friendswood, TX"
+  },
+  "summary": "",
+  "experience": [
+    {
+      "title": "Senior Software Engineer",
+      "company": "Iflexion",
+      "startDate": "03/2022",
+      "endDate": "Present",
+      "location": "Remote",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Software Engineer",
+      "company": "Brainvire",
+      "startDate": "09/2019",
+      "endDate": "02/2022",
+      "location": "Remote",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Junior Software Engineer",
+      "company": "December Labs",
+      "startDate": "06/2015",
+      "endDate": "08/2019",
+      "location": "Houston, TX",
+      "description": "",
+      "achievements": []
+    }
+  ],
+  "strengths": [],
+  "skills": [],
+  "education": [
+    {
+      "degree": "Bachelor of Computer Science",
+      "institution": "Rice University",
+      "startDate": "08/2011",
+      "endDate": "05/2015",
+      "location": "Houston, TX",
+      "gpa": ""
+    }
+  ],
+  "certifications": [],
+  "id": "d2ca9f66-59b3-4175-b080-9161a5525932",
+  "createdAt": "2026-03-02T00:37:36.803Z",
+  "updatedAt": "2026-03-02T00:38:02.026Z"
+}

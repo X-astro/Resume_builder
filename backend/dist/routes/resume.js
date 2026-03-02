@@ -13,6 +13,9 @@ const coverLetterGenerator_1 = require("../services/coverLetterGenerator");
 const generatedPath_1 = require("../services/generatedPath");
 const templateExtractor_1 = require("../services/templateExtractor");
 const aiModelConfig_1 = require("../services/aiModelConfig");
+const multipleProfilesConfig_1 = require("../services/multipleProfilesConfig");
+const userService_1 = require("../services/userService");
+const userAuth_1 = require("../middleware/userAuth");
 const router = (0, express_1.Router)();
 const PROFILES_DIR = path_1.default.join(__dirname, '../../data/profiles');
 // Get enabled AI models
@@ -23,6 +26,24 @@ router.get('/models', async (req, res) => {
     }
     catch {
         res.status(500).json({ error: 'Failed to fetch AI model settings' });
+    }
+});
+// Get default profile IDs for Multiple mode (user-specific when logged in, else admin default)
+router.get('/default-multiple-profiles', async (req, res) => {
+    try {
+        const authHeader = req.headers.authorization;
+        if (authHeader?.startsWith('Bearer ')) {
+            const decoded = (0, userAuth_1.decodeUserToken)(authHeader.substring(7));
+            if (decoded) {
+                const profileIds = await (0, userService_1.getUserMultipleProfileIds)(decoded.userId);
+                return res.json({ profileIds });
+            }
+        }
+        const profileIds = await (0, multipleProfilesConfig_1.getMultipleModeProfileIds)();
+        res.json({ profileIds });
+    }
+    catch {
+        res.status(500).json({ error: 'Failed to fetch default multiple profiles', profileIds: [] });
     }
 });
 // Analyze job description
@@ -67,10 +88,10 @@ async function loadAllProfiles() {
     }
     return profiles.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
 }
-// Generate for all profiles at once
+// Generate for multiple profiles (all or selected)
 router.post('/generate-all', async (req, res) => {
     try {
-        const { templateId, jobDescription, jobAnalysis, companyName, role, model, format = 'both' } = req.body;
+        const { templateId, jobDescription, jobAnalysis, companyName, role, model, format = 'both', profileIds: requestedProfileIds, } = req.body;
         const settings = await (0, aiModelConfig_1.getAIModelSettings)();
         const selectedModel = (0, claude_1.resolveAIProvider)(model);
         if (!(0, aiModelConfig_1.isProviderEnabled)(selectedModel, settings)) {
@@ -85,9 +106,13 @@ router.post('/generate-all', async (req, res) => {
             res.status(400).json({ error: 'Role is required' });
             return;
         }
-        const profiles = await loadAllProfiles();
+        let profiles = await loadAllProfiles();
+        if (Array.isArray(requestedProfileIds) && requestedProfileIds.length > 0) {
+            const idSet = new Set(requestedProfileIds.filter((id) => typeof id === 'string'));
+            profiles = profiles.filter((p) => idSet.has(p.id));
+        }
         if (profiles.length === 0) {
-            res.status(400).json({ error: 'No profiles available. Add profiles in Admin.' });
+            res.status(400).json({ error: 'No profiles available. Add or select profiles.' });
             return;
         }
         await (0, templateExtractor_1.createDefaultTemplate)();

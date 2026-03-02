@@ -1,8 +1,8 @@
 {
   "name": "John Vento",
   "title": "Senior Software Engineer",
-  "totalYearsExperience": 10,
-  "preferredTemplate": "default",
+  "totalYearsExperience": 12,
+  "preferredTemplate": "two-column-john",
   "disabled": false,
   "contact": {
     "phone": "(415) 748-5944",
@@ -87,5 +87,5 @@
   "certifications": [],
   "id": "f38556d3-61bf-491a-b254-1952ee9df701",
   "createdAt": "2026-02-22T23:51:06.925Z",
-  "updatedAt": "2026-02-26T02:01:29.417Z"
+  "updatedAt": "2026-03-02T12:00:37.611Z"
 }

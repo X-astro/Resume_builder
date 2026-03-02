@@ -12,6 +12,8 @@ const profiles_1 = __importDefault(require("./routes/profiles"));
 const templates_1 = __importDefault(require("./routes/templates"));
 const resume_1 = __importDefault(require("./routes/resume"));
 const admin_1 = __importDefault(require("./routes/admin"));
+const auth_1 = __importDefault(require("./routes/auth"));
+const users_1 = __importDefault(require("./routes/users"));
 dotenv_1.default.config({ path: path_1.default.join(__dirname, '../../.env') });
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 3001;
@@ -45,6 +47,8 @@ app.use('/api/profiles', profiles_1.default);
 app.use('/api/templates', templates_1.default);
 app.use('/api/resume', resume_1.default);
 app.use('/api/admin', admin_1.default);
+app.use('/api/auth', auth_1.default);
+app.use('/api/users', users_1.default);
 // Health check
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });

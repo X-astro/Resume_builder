@@ -1,11 +1,11 @@
 {
   "name": "Ryan Jung",
   "title": "Senior Software Engineer",
-  "totalYearsExperience": 7,
+  "totalYearsExperience": 8,
   "preferredTemplate": "default",
   "disabled": false,
   "contact": {
-    "phone": "(628)238-8357",
+    "phone": "(628) 238-8357",
     "email": "rjung.sf@gmail.com",
     "linkedin": "https://www.linkedin.com/in/ryan-jung-ba6298160/",
     "github": "",
@@ -79,5 +79,5 @@
   "certifications": [],
   "id": "e3dcb78f-ea68-4a89-8042-5f362b8869bb",
   "createdAt": "2026-02-26T13:49:31.835Z",
-  "updatedAt": "2026-02-26T15:02:47.139Z"
+  "updatedAt": "2026-03-02T02:02:49.364Z"
 }

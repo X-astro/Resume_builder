@@ -1,0 +1,78 @@
+{
+  "name": "Yang He",
+  "title": "Senior Software Engineer",
+  "totalYearsExperience": 10,
+  "preferredTemplate": "one-column-pdf",
+  "disabled": false,
+  "contact": {
+    "phone": "(510) 397-8594",
+    "email": "Yang.he1809@gmail.com",
+    "linkedin": "https://www.linkedin.com/in/kogayou/",
+    "github": "",
+    "portfolio": "",
+    "location": "Bellevue, WA"
+  },
+  "summary": "",
+  "experience": [
+    {
+      "title": "Senior Software Engineer",
+      "company": "Meta",
+      "startDate": "02/2020",
+      "endDate": "Present",
+      "location": "Seattle, WA",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Software Engineer",
+      "company": "Meta",
+      "startDate": "04/2016",
+      "endDate": "02/2020",
+      "location": "Seattle, WA",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Software Engineer Internship",
+      "company": "Meta",
+      "startDate": "06/2015",
+      "endDate": "09/2015",
+      "location": "Menlo Park",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Software Engineer Internship",
+      "company": "Morgan Stanley",
+      "startDate": "07/2013",
+      "endDate": "12/2013",
+      "location": "Shanghai",
+      "description": "",
+      "achievements": []
+    }
+  ],
+  "strengths": [],
+  "skills": [],
+  "education": [
+    {
+      "degree": "Master of Science (MS), Computer Science",
+      "institution": "UCLA",
+      "startDate": "2014",
+      "endDate": "2016",
+      "location": "",
+      "gpa": ""
+    },
+    {
+      "degree": "Bachelor of Science (BS), Computer Science",
+      "institution": "Fudan University",
+      "startDate": "2010",
+      "endDate": "2014",
+      "location": "",
+      "gpa": ""
+    }
+  ],
+  "certifications": [],
+  "id": "99d20129-d2f5-4acc-9462-71df04d0ffc8",
+  "createdAt": "2026-03-02T12:09:48.272Z",
+  "updatedAt": "2026-03-02T12:11:56.387Z"
+}

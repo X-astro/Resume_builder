@@ -1,0 +1,70 @@
+{
+  "name": "William Cheng",
+  "title": "Senior Software Engineer",
+  "totalYearsExperience": 12,
+  "preferredTemplate": "one-column-michael",
+  "disabled": false,
+  "contact": {
+    "phone": "(813) 492-5329",
+    "email": "William.cheng2540@gmail.com",
+    "linkedin": "https://www.linkedin.com/in/william-cheng-8abb82b1/",
+    "github": "",
+    "portfolio": "",
+    "location": "New York, NY"
+  },
+  "summary": "",
+  "experience": [
+    {
+      "title": "Senior Software Engineer",
+      "company": "Squarespace",
+      "startDate": "10/2021",
+      "endDate": "Present",
+      "location": "New York, NY",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Software Engineer",
+      "company": "LoanStreet Inc.",
+      "startDate": "06/2018",
+      "endDate": "10/2021",
+      "location": "New York, NY",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Software Developer",
+      "company": "TrinSoft, LLC",
+      "startDate": "06/2016",
+      "endDate": "02/2018",
+      "location": "New York, NY",
+      "description": "",
+      "achievements": []
+    },
+    {
+      "title": "Software Developer",
+      "company": "TriTech Software Systems",
+      "startDate": "08/2013",
+      "endDate": "05/2016",
+      "location": "Melville, NY",
+      "description": "",
+      "achievements": []
+    }
+  ],
+  "strengths": [],
+  "skills": [],
+  "education": [
+    {
+      "degree": "Bachelor of Science, Computer Science",
+      "institution": "Stony Brook University",
+      "startDate": "2009",
+      "endDate": "2014",
+      "location": "",
+      "gpa": ""
+    }
+  ],
+  "certifications": [],
+  "id": "d803fc74-fe81-46bc-a7bc-16374594d0c9",
+  "createdAt": "2026-03-02T02:22:30.907Z",
+  "updatedAt": "2026-03-02T02:22:30.907Z"
+}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   profilesApi,
   resumeApi,
@@ -11,12 +12,24 @@ import {
   JobAnalysis,
 } from '@/lib/api';
 import ProfileSelector from '@/components/ProfileSelector';
+import { useAuth } from '@/contexts/AuthContext';
 
-type GenerateMode = 'single' | 'multiple';
+type GenerateMode = 'single' | 'all' | 'selected';
+
+const STORAGE_KEY = 'resumeBuilder.multipleProfileIds';
 
 export default function Home() {
+  const router = useRouter();
+  const { user, isLoading: authLoading, logout, getMultipleProfileIds } = useAuth();
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.replace('/login');
+    }
+  }, [authLoading, user, router]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
+  const [selectedProfileIds, setSelectedProfileIds] = useState<Set<string>>(new Set());
   const [generateMode, setGenerateMode] = useState<GenerateMode>('single');
   const [companyName, setCompanyName] = useState('');
   const [role, setRole] = useState('');
@@ -35,24 +48,72 @@ export default function Home() {
   const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
+    if (authLoading || !user) return;
     loadInitialData();
-  }, []);
+  }, [authLoading, user, user?.id]);
+
+  useEffect(() => {
+    if (generateMode === 'selected' && selectedProfileIds.size === 0 && profiles.length > 0) {
+      loadSavedProfileIds().then((saved) => {
+        if (saved.length > 0) {
+          const valid = saved.filter((id) => profiles.some((p) => p.id === id));
+          if (valid.length > 0) setSelectedProfileIds(new Set(valid));
+          return;
+        }
+        resumeApi.getDefaultMultipleProfiles().then((res) => {
+          const valid = (res.profileIds ?? []).filter((id) => profiles.some((p) => p.id === id));
+          if (valid.length > 0) setSelectedProfileIds(new Set(valid));
+        }).catch(() => {});
+      });
+    }
+  }, [generateMode, profiles, user?.id]);
+
+  const loadSavedProfileIds = async (): Promise<string[]> => {
+    if (user) return getMultipleProfileIds();
+    if (typeof window === 'undefined') return [];
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === 'string') : [];
+    } catch {
+      return [];
+    }
+  };
 
   const loadInitialData = async () => {
     try {
-      const [profilesData, modelData] = await Promise.all([
+      const savedIds = user ? await getMultipleProfileIds() : (() => {
+        if (typeof window === 'undefined') return [];
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return [];
+          const parsed = JSON.parse(raw);
+          return Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === 'string') : [];
+        } catch {
+          return [];
+        }
+      })();
+      const [profilesData, modelData, defaultMultiple] = await Promise.all([
         profilesApi.getAll({ includeDisabled: true }),
         resumeApi.getModels().catch(() => ({ openaiEnabled: true, claudeEnabled: true })),
+        resumeApi.getDefaultMultipleProfiles().catch(() => ({ profileIds: [] })),
       ]);
-      setProfiles(profilesData.filter((p) => !p.disabled));
+      const enabledProfiles = profilesData.filter((p) => !p.disabled);
+      setProfiles(enabledProfiles);
       setModelSettings(modelData);
       if (!modelData.openaiEnabled && modelData.claudeEnabled) {
         setSelectedModel('claude');
       } else if (modelData.openaiEnabled && !modelData.claudeEnabled) {
         setSelectedModel('openai');
       }
-      if (profilesData.length > 0) {
-        setSelectedProfileId(profilesData[0].id);
+      if (enabledProfiles.length > 0) {
+        setSelectedProfileId(enabledProfiles[0].id);
+      }
+      const source = savedIds.length > 0 ? savedIds : (defaultMultiple.profileIds ?? []);
+      const valid = source.filter((id: string) => enabledProfiles.some((p) => p.id === id));
+      if (valid.length > 0) {
+        setSelectedProfileIds(new Set(valid));
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load data');
@@ -78,8 +139,12 @@ export default function Home() {
       setError('Please select a profile');
       return;
     }
-    if (generateMode === 'multiple' && profiles.length === 0) {
+    if (generateMode === 'all' && profiles.length === 0) {
       setError('No profiles available');
+      return;
+    }
+    if (generateMode === 'selected' && selectedProfileIds.size === 0) {
+      setError('Please select at least one profile');
       return;
     }
 
@@ -109,7 +174,11 @@ export default function Home() {
         });
         setSuccessMessage('Resume generated successfully.');
       } else {
-        setGenerationStep(`Generating for ${profiles.length} profile(s)...`);
+        const targetProfiles =
+          generateMode === 'selected'
+            ? profiles.filter((p) => selectedProfileIds.has(p.id))
+            : profiles;
+        setGenerationStep(`Generating for ${targetProfiles.length} profile(s)...`);
         const res = await resumeApi.generateAll({
           jobDescription,
           jobAnalysis: analysis,
@@ -117,6 +186,7 @@ export default function Home() {
           role: role.trim(),
           model: selectedModel,
           format: 'both',
+          ...(generateMode === 'selected' && { profileIds: [...selectedProfileIds] }),
         });
         setSuccessMessage(`Generated ${res.generated} resume(s) successfully.`);
       }
@@ -128,7 +198,7 @@ export default function Home() {
     }
   };
 
-  if (isLoadingData) {
+  if (authLoading || !user || isLoadingData) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
@@ -148,12 +218,42 @@ export default function Home() {
             <h1 className="text-xl font-bold text-gray-900">
               Tailored Resume Builder
             </h1>
-            <Link
-              href="/admin"
-              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md"
-            >
-              Admin Panel
-            </Link>
+            <div className="flex items-center gap-2">
+              {user ? (
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-gray-600">
+                    {user.name || user.email}
+                  </span>
+                  <button
+                    onClick={logout}
+                    className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md"
+                  >
+                    Sign in
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
+                    Create account
+                  </Link>
+                </>
+              )}
+              <Link
+                href="/admin"
+                className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md"
+              >
+                Admin Panel
+              </Link>
+            </div>
           </div>
         </div>
       </header>
@@ -183,7 +283,7 @@ export default function Home() {
             <label className="block text-sm font-medium text-gray-700 mb-3">
               Generate mode
             </label>
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-4">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="radio"
@@ -194,19 +294,31 @@ export default function Home() {
                   disabled={isGenerating}
                   className="w-4 h-4 text-blue-600"
                 />
-                <span>Single (one profile)</span>
+                <span>Single</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="radio"
                   name="generateMode"
-                  value="multiple"
-                  checked={generateMode === 'multiple'}
-                  onChange={() => setGenerateMode('multiple')}
+                  value="selected"
+                  checked={generateMode === 'selected'}
+                  onChange={() => setGenerateMode('selected')}
                   disabled={isGenerating}
                   className="w-4 h-4 text-blue-600"
                 />
-                <span>Multiple (all profiles)</span>
+                <span>Multiple</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="generateMode"
+                  value="all"
+                  checked={generateMode === 'all'}
+                  onChange={() => setGenerateMode('all')}
+                  disabled={isGenerating}
+                  className="w-4 h-4 text-blue-600"
+                />
+                <span>All</span>
               </label>
             </div>
           </div>
@@ -218,6 +330,14 @@ export default function Home() {
               onChange={setSelectedProfileId}
               isLoading={false}
             />
+          )}
+
+          {generateMode === 'selected' && (
+            <p className="text-sm text-gray-600">
+              {selectedProfileIds.size > 0
+                ? `${selectedProfileIds.size} profile${selectedProfileIds.size === 1 ? '' : 's'} selected.`
+                : 'No profiles selected. Set defaults in Admin → Settings.'}
+            </p>
           )}
 
           <div>
@@ -287,7 +407,11 @@ export default function Home() {
                 {generationStep || 'Generating...'}
               </>
             ) : (
-              generateMode === 'single' ? 'Generate Resume' : `Generate All (${profiles.length} profiles)`
+              generateMode === 'single'
+                ? 'Generate Resume'
+                : generateMode === 'all'
+                  ? `Generate All (${profiles.length} profiles)`
+                  : `Generate Multiple (${selectedProfileIds.size} profile${selectedProfileIds.size === 1 ? '' : 's'})`
             )}
           </button>
         </div>

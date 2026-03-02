@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const auth_1 = require("../middleware/auth");
 const aiModelConfig_1 = require("../services/aiModelConfig");
+const multipleProfilesConfig_1 = require("../services/multipleProfilesConfig");
 const router = (0, express_1.Router)();
 // Login
 router.post('/login', (req, res) => {
@@ -50,6 +51,32 @@ router.put('/ai-models', auth_1.authMiddleware, async (req, res) => {
     catch (error) {
         res.status(400).json({
             error: error instanceof Error ? error.message : 'Failed to update AI model settings',
+        });
+    }
+});
+// Get default Multiple mode profiles (protected)
+router.get('/multiple-profiles', auth_1.authMiddleware, async (req, res) => {
+    try {
+        const profileIds = await (0, multipleProfilesConfig_1.getMultipleModeProfileIds)();
+        res.json({ profileIds });
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Failed to fetch multiple profiles config', profileIds: [] });
+    }
+});
+// Update default Multiple mode profiles (protected)
+router.put('/multiple-profiles', auth_1.authMiddleware, async (req, res) => {
+    try {
+        const { profileIds } = req.body;
+        const ids = Array.isArray(profileIds)
+            ? profileIds.filter((id) => typeof id === 'string')
+            : [];
+        const saved = await (0, multipleProfilesConfig_1.setMultipleModeProfileIds)(ids);
+        res.json({ profileIds: saved });
+    }
+    catch (error) {
+        res.status(400).json({
+            error: error instanceof Error ? error.message : 'Failed to update multiple profiles config',
         });
     }
 });

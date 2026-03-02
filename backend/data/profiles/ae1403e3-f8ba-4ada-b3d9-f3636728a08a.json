@@ -1,7 +1,8 @@
 {
   "name": "Sagar Nuepane",
   "title": "Senior Full Stack Engineer",
-  "preferredTemplate": "",
+  "totalYearsExperience": 11,
+  "preferredTemplate": "750ce261-8304-47af-bd7b-1eab10722910",
   "disabled": false,
   "contact": {
     "phone": "(737) 378-1867",
@@ -65,5 +66,5 @@
   "certifications": [],
   "id": "ae1403e3-f8ba-4ada-b3d9-f3636728a08a",
   "createdAt": "2026-02-27T02:33:40.614Z",
-  "updatedAt": "2026-02-27T02:33:40.614Z"
+  "updatedAt": "2026-03-02T00:39:26.624Z"
 }

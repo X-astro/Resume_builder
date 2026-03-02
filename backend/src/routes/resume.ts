@@ -8,6 +8,7 @@ import { saveCoverLetter, saveCoverLetterDOCX } from '../services/coverLetterGen
 import { getGeneratedOutputPath } from '../services/generatedPath';
 import { getTemplateById, createDefaultTemplate } from '../services/templateExtractor';
 import { getAIModelSettings, getDefaultEnabledProvider, isProviderEnabled } from '../services/aiModelConfig';
+import { getMultipleModeProfileIds } from '../services/multipleProfilesConfig';
 import { Profile } from '../types/profile';
 import { AIProvider, GenerateResumeRequest } from '../types/template';
 
@@ -21,6 +22,16 @@ router.get('/models', async (req: Request, res: Response) => {
     res.json(settings);
   } catch {
     res.status(500).json({ error: 'Failed to fetch AI model settings' });
+  }
+});
+
+// Get default profile IDs for Multiple mode (public - used by main page)
+router.get('/default-multiple-profiles', async (req: Request, res: Response) => {
+  try {
+    const profileIds = await getMultipleModeProfileIds();
+    res.json({ profileIds });
+  } catch {
+    res.status(500).json({ error: 'Failed to fetch default multiple profiles', profileIds: [] });
   }
 });
 
@@ -67,7 +78,7 @@ async function loadAllProfiles(): Promise<Profile[]> {
   return profiles.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
 }
 
-// Generate for all profiles at once
+// Generate for multiple profiles (all or selected)
 router.post('/generate-all', async (req: Request, res: Response) => {
   try {
     const {
@@ -77,7 +88,8 @@ router.post('/generate-all', async (req: Request, res: Response) => {
       companyName,
       role,
       model,
-      format = 'both'
+      format = 'both',
+      profileIds: requestedProfileIds,
     } = req.body;
 
     const settings = await getAIModelSettings();
@@ -95,9 +107,13 @@ router.post('/generate-all', async (req: Request, res: Response) => {
       return;
     }
 
-    const profiles = await loadAllProfiles();
+    let profiles = await loadAllProfiles();
+    if (Array.isArray(requestedProfileIds) && requestedProfileIds.length > 0) {
+      const idSet = new Set(requestedProfileIds.filter((id: unknown) => typeof id === 'string'));
+      profiles = profiles.filter((p) => idSet.has(p.id));
+    }
     if (profiles.length === 0) {
-      res.status(400).json({ error: 'No profiles available. Add profiles in Admin.' });
+      res.status(400).json({ error: 'No profiles available. Add or select profiles.' });
       return;
     }
 

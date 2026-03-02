@@ -45,9 +45,68 @@ export function removeToken(): void {
   }
 }
 
+// User auth (separate from admin)
+const USER_TOKEN_KEY = 'userToken';
+
+export function getUserToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    return localStorage.getItem(USER_TOKEN_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function setUserToken(token: string): void {
+  try {
+    localStorage.setItem(USER_TOKEN_KEY, token);
+  } catch {
+    // Ignore
+  }
+}
+
+export function removeUserToken(): void {
+  try {
+    localStorage.removeItem(USER_TOKEN_KEY);
+  } catch {
+    // Ignore
+  }
+}
+
 function getAuthHeaders(): HeadersInit {
   const token = getToken();
   return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+async function apiFetchWithUserToken<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  const userToken = getUserToken();
+  const headers: HeadersInit = {
+    ...(userToken ? { Authorization: `Bearer ${userToken}` } : {}),
+    ...options.headers,
+  };
+  if (!(options.body instanceof FormData)) {
+    (headers as Record<string, string>)['Content-Type'] = 'application/json';
+  }
+
+  let lastError: Error | null = null;
+  for (const apiBase of buildApiBaseCandidates()) {
+    const url = `${apiBase}${endpoint}`;
+    try {
+      const response = await fetch(url, { ...options, headers });
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({ error: 'Request failed' }));
+        throw new Error(err.error || 'Request failed');
+      }
+      resolvedApiBase = apiBase;
+      return response.json();
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      const isConnection = msg.includes('fetch') || msg.includes('Failed to fetch') || msg.includes('NetworkError');
+      if (!isConnection) throw error;
+      lastError = error instanceof Error ? error : new Error(msg);
+    }
+  }
+  throw lastError ?? new Error('Unable to connect to backend');
 }
 
 // Generic fetch wrapper
@@ -128,6 +187,57 @@ export const adminApi = {
     apiFetch<AIModelSettings>('/admin/ai-models', {
       method: 'PUT',
       body: JSON.stringify(data),
+    }),
+
+  getMultipleProfiles: () =>
+    apiFetch<{ profileIds: string[] }>('/admin/multiple-profiles'),
+
+  updateMultipleProfiles: (profileIds: string[]) =>
+    apiFetch<{ profileIds: string[] }>('/admin/multiple-profiles', {
+      method: 'PUT',
+      body: JSON.stringify({ profileIds }),
+    }),
+
+  getUsers: () =>
+    apiFetch<{ users: Array<{ id: string; email: string; name?: string }> }>('/admin/users'),
+
+  getUserMultipleProfiles: (userId: string) =>
+    apiFetch<{ profileIds: string[] }>(`/admin/users/${userId}/multiple-profiles`),
+
+  updateUserMultipleProfiles: (userId: string, profileIds: string[]) =>
+    apiFetch<{ profileIds: string[] }>(`/admin/users/${userId}/multiple-profiles`, {
+      method: 'PUT',
+      body: JSON.stringify({ profileIds }),
+    }),
+};
+
+// Auth API (no token required for login/register)
+export const authApi = {
+  register: (data: { email: string; password: string; name?: string }) =>
+    apiFetchWithUserToken<{ token: string; user: { id: string; email: string; name?: string } }>('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  login: (data: { email: string; password: string }) =>
+    apiFetchWithUserToken<{ token: string; user: { id: string; email: string; name?: string } }>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+};
+
+// Users API (requires user token)
+export const usersApi = {
+  getMe: () =>
+    apiFetchWithUserToken<{ id: string; email: string; name?: string }>('/users/me'),
+
+  getMultipleProfiles: () =>
+    apiFetchWithUserToken<{ profileIds: string[] }>('/users/me/multiple-profiles'),
+
+  updateMultipleProfiles: (profileIds: string[]) =>
+    apiFetchWithUserToken<{ profileIds: string[] }>('/users/me/multiple-profiles', {
+      method: 'PUT',
+      body: JSON.stringify({ profileIds }),
     }),
 };
 
@@ -381,6 +491,9 @@ export const templatesApi = {
 export const resumeApi = {
   getModels: () => apiFetch<AIModelSettings>('/resume/models'),
 
+  getDefaultMultipleProfiles: () =>
+    apiFetch<{ profileIds: string[] }>('/resume/default-multiple-profiles'),
+
   analyze: (jobDescription: string, model: AIProvider) =>
     apiFetch<JobAnalysis>('/resume/analyze', {
       method: 'POST',
@@ -424,6 +537,7 @@ export const resumeApi = {
     role: string;
     model: AIProvider;
     format?: 'pdf' | 'docx' | 'both';
+    profileIds?: string[];
   }) =>
     apiFetch<{
       generated: number;

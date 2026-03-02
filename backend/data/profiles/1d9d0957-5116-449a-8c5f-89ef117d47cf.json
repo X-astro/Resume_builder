@@ -1,0 +1,83 @@
+{
+  "name": "Andrew Tautkus",
+  "title": "Senior Software Engineer",
+  "totalYearsExperience": 9,
+  "preferredTemplate": "one-column-james",
+  "disabled": false,
+  "contact": {
+    "phone": "(737) 231-1032",
+    "email": "andytautkus@gmail.com",
+    "linkedin": "https://linkedin.com/in/andrew-tautkus-4035aa103",
+    "github": "",
+    "portfolio": "",
+    "location": "Austin, TX"
+  },
+  "summary": "",
+  "experience": [
+    {
+      "title": "Senior Software Engineer",
+      "company": "Kunai",
+      "startDate": "07/2024",
+      "endDate": "Present",
+      "location": "Remote, USA",
+      "description": "Senior individual contributor embedded within a major financial institution client, architecting and delivering backend and frontend services for digital banking products in a regulated environment.",
+      "achievements": []
+    },
+    {
+      "title": "Senior Software Engineer",
+      "company": "Vestmark",
+      "startDate": "01/2022",
+      "endDate": "07/2024",
+      "location": "Boston, MA, USA",
+      "description": "Senior engineer on a leading B2B wealth management SaaS platform, owning high-throughput backend services and AWS infrastructure for portfolio rebalancing and order management at institutional scale.",
+      "achievements": []
+    },
+    {
+      "title": "Software Engineer",
+      "company": "Fidelity Investments",
+      "startDate": "09/2017",
+      "endDate": "01/2022",
+      "location": "Nashua, NH, USA",
+      "description": "Software Engineer building Java backend services, Python automation, and AWS-integrated systems for large-scale brokerage and retirement platforms used by tens of millions of investors.",
+      "achievements": []
+    },
+    {
+      "title": "Software Engineering Intern",
+      "company": "Verizon",
+      "startDate": "06/2016",
+      "endDate": "08/2016",
+      "location": "Waltham, MA, USA",
+      "description": "Software Engineering Intern developing internal tooling and automation scripts to support network operations and prototyping data visualization dashboards.",
+      "achievements": []
+    }
+  ],
+  "strengths": [
+    {
+      "title": "",
+      "description": ""
+    },
+    {
+      "title": "",
+      "description": ""
+    },
+    {
+      "title": "",
+      "description": ""
+    }
+  ],
+  "skills": [],
+  "education": [
+    {
+      "degree": "Bachelor of Science in Computer Science",
+      "institution": "Worcester Polytechnic Institute (WPI)",
+      "startDate": "09/2013",
+      "endDate": "05/2017",
+      "location": "Worcester, MA",
+      "gpa": ""
+    }
+  ],
+  "certifications": [],
+  "id": "1d9d0957-5116-449a-8c5f-89ef117d47cf",
+  "createdAt": "2026-03-02T01:57:58.669Z",
+  "updatedAt": "2026-03-02T12:03:36.472Z"
+}
